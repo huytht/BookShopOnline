@@ -1,18 +1,20 @@
 from fastapi import APIRouter, Body, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from pydantic.networks import HttpUrl
 from datetime import datetime
-from ..models import UserModel, UserUpdateModel
+from ..models.user import UserModel, UserUpdateModel
+from dateutil import parser
+import calendar
+from bson.timestamp import Timestamp
 
 router = APIRouter()
+
+TIME_FORMAT='%Y-%m-%dT%H:%M:%S'
 
 @router.get("/", response_description="List all user")
 async def list_users(request: Request):
     users = []
     for doc in await request.app.mongodb["user"].find().to_list(length=100):
-        doc['date_of_birth'] = doc['date_of_birth'].strftime("%d/%m/%Y")
-        doc['registration_date'] = doc['registration_date'].strftime("%d/%m/%Y")
         users.append(doc)
 
     return users
@@ -27,8 +29,8 @@ async def get_user(id: str, request: Request):
 @router.post("/create-user/")
 async def create_user(request: Request, user: UserModel = Body(...)):
     user = jsonable_encoder(user)
-    user['date_of_birth'] = datetime.strptime(user['date_of_birth'], "%Y-%m-%dT%H:%M:%S")
-    user['registration_date'] = datetime.strptime(user['registration_date'], "%Y-%m-%dT%H:%M:%S.%f")
+    user['date_of_birth'] = datetime.strptime(user['date_of_birth'], TIME_FORMAT + "+00:00").timestamp()
+    user['registration_date'] = datetime.strptime(user['registration_date'], TIME_FORMAT + "+00:00").timestamp()
     new_user = await request.app.mongodb["user"].insert_one(user)
     created_user = await request.app.mongodb["user"].find_one(
         {"_id": new_user.inserted_id}
@@ -41,6 +43,7 @@ async def update_user(id: str, request: Request, user: UserUpdateModel = Body(..
     user = {k: v for k, v in user.dict().items() if v is not None}
 
     if (len(user) >= 1):
+        user['date_of_birth'] = user['date_of_birth'].timestamp()        
         update_user_result = await request.app.mongodb["user"].update_one(
             {"_id": id},
             {"$set": user}

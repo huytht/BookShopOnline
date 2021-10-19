@@ -2,14 +2,14 @@ import { Navigate } from 'react-router-dom';
 import DashboardLayout from './components/DashboardLayout';
 import MainLayout from './components/MainLayout';
 import Account from './pages/Account';
-import CustomerList from './pages/CustomerList';
+import UserList from './pages/UserList';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import ProductList from './pages/ProductList';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
-import AddCustomers from './components/customer/AddCustomers';
+import UserForm from './components/user/UserForm';
 
 const routes = [
   {
@@ -17,9 +17,9 @@ const routes = [
     element: <DashboardLayout />,
     children: [
       { path: 'account', element: <Account /> },
-      { path: 'customers', element: <CustomerList /> },
+      { path: 'users', element: <UserList /> },
       { path: 'dashboard', element: <Dashboard /> },
-      { path: 'add-customer', element: <AddCustomers /> },
+      { path: 'user-form', element: <UserForm /> },
       { path: 'products', element: <ProductList /> },
       { path: 'settings', element: <Settings /> },
       { path: '*', element: <Navigate to="/404" /> }

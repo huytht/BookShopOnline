@@ -1,12 +1,15 @@
 from datetime import datetime
+import json
 from fastapi import APIRouter, Body, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from pydantic.networks import HttpUrl
-
-from ..models import BookModel, BookUpdateModel, CategoryModel
+from ..models.book import BookModel, BookUpdateModel
 
 router = APIRouter()
+
+def defaultconverter(o):
+  if isinstance(o, datetime):
+      return o.__str__()
 
 @router.get("/", response_description="List all book")
 async def list_books(request: Request):
@@ -39,7 +42,8 @@ async def get_book(id: str, request: Request):
 @router.post("/create-book/")
 async def create_book(request: Request, book: BookModel = Body(...)):
     book = jsonable_encoder(book)
-    book['published_date'] = datetime.strptime(book['published_date'], "%Y-%m-%dT%H:%M:%S")
+    # book['published_date'] = datetime.strptime(book['published_date'], "%Y-%m-%d %H:%M:%S")
+    # book = json.dumps(book, default = defaultconverter)
     new_book = await request.app.mongodb["book"].insert_one(book)
     created_book = await request.app.mongodb["book"].find_one(
         {"_id": new_book.inserted_id}

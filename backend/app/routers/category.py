@@ -4,7 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from pydantic.networks import HttpUrl
 from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi.logger import logger
-from ..models import CategoryModel, CategoryUpdateModel
+from ..models.category import CategoryModel, CategoryUpdateModel
 
 router = APIRouter()
 

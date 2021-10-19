@@ -21,6 +21,10 @@
     }
   },
   "rules": {
+    "operator-linebreak": "off",
+    "no-underscore-dangle": "off",
+    "indent": "off",
+    "no-nested-ternary": "off",
     "comma-dangle": "off",
     "jsx-a11y/anchor-is-valid": "off",
     "max-len": "off",

@@ -1,3 +1,4 @@
+from typing_extensions import TypeAlias
 from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
 from .config import settings
@@ -11,8 +12,8 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",
     "localhost:3000",
-    "http://localhost:5020",
-    "localhost:5020"
+    "http://localhost:8000",
+    "localhost:8000"
 ]
 
 app.add_middleware(
@@ -34,7 +35,7 @@ app.include_router(router_category, tags=["Categories"], prefix="/category")
 
 @app.on_event("startup")
 async def startup_db_client():
-    app.mongodb_client = AsyncIOMotorClient(settings.DB_URL)
+    app.mongodb_client = AsyncIOMotorClient(settings.DB_URL, tls=True, tlsAllowInvalidCertificates=True)
     app.mongodb = app.mongodb_client[settings.DB_NAME]
 
 @app.on_event("shutdown")
