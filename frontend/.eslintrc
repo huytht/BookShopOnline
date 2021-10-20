@@ -21,6 +21,7 @@
     }
   },
   "rules": {
+    "no-unused-vars": "off",
     "operator-linebreak": "off",
     "no-underscore-dangle": "off",
     "indent": "off",

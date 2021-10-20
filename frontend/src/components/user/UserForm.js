@@ -57,9 +57,9 @@ const UserForm = () => {
           `http://localhost:8000/user/get-user/${params.get('id')}`
         );
         const fetchedUser = await response.json();
-        fetchedUser.date_of_birth = moment.unix(fetchedUser.date_of_birth).format(
-          'yyyy-MM-DD'
-        );
+        fetchedUser.date_of_birth = moment
+          .unix(fetchedUser.date_of_birth)
+          .format('yyyy-MM-DD');
         setValues(fetchedUser);
       };
       fetchUserData();
@@ -72,6 +72,7 @@ const UserForm = () => {
       [event.target.name]: event.target.value
     });
   };
+
   const submitFormHandler = (event) => {
     event.preventDefault();
     const dob = Math.floor(new Date(values.date_of_birth).getTime() / 1000);

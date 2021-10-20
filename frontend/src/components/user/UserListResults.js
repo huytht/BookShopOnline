@@ -16,15 +16,19 @@ import {
   TableHead,
   TablePagination,
   TableRow
-  // Button
-  // Typography
 } from '@material-ui/core';
-// import getInitials from '../../utils/getInitials';
+import axios from 'axios';
 
 const UserListResults = ({ users }) => {
   const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
+
+  const deleteUserHandler = (id) => {
+    axios
+      .delete(`http://localhost:8000/user/delete-user/${id}`)
+      .then((res) => console.log(res));
+  };
 
   const handleSelectAll = (event) => {
     let newSelectedUserIds;
@@ -137,8 +141,13 @@ const UserListResults = ({ users }) => {
                     </IconButton>
                   </TableCell>
                   <TableCell>
+                    {/* onClick={deleteUserHandler(user._id)} */}
                     <IconButton>
-                      <DeleteIcon />
+                      <DeleteIcon
+                        onClick={() => {
+                          deleteUserHandler(user._id);
+                        }}
+                      />
                     </IconButton>
                   </TableCell>
                 </TableRow>
