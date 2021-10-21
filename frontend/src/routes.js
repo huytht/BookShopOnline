@@ -10,6 +10,8 @@ import ProductList from './pages/ProductList';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
 import UserForm from './components/user/UserForm';
+import CategoryForm from './components/category/CategoryForm';
+import Categorylist from './pages/Categorylist';
 
 const routes = [
   {
@@ -18,8 +20,10 @@ const routes = [
     children: [
       { path: 'account', element: <Account /> },
       { path: 'users', element: <UserList /> },
+      { path: 'category', element: <Categorylist /> },
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'user-form', element: <UserForm /> },
+      { path: 'category-form', element: <CategoryForm /> },
       { path: 'products', element: <ProductList /> },
       { path: 'settings', element: <Settings /> },
       { path: '*', element: <Navigate to="/404" /> }

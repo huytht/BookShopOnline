@@ -4,3 +4,5 @@
 .vs/VSWorkspaceState.json
 *.sqlite
 env/
+node_modules/
+backend/
