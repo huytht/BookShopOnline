@@ -22,6 +22,8 @@
   },
   "rules": {
     "no-unused-vars": "off",
+    "react/prop-types": "off",
+    "object-curly-newline": "off",
     "linebreak-style": "off",
     "operator-linebreak": "off",
     "no-underscore-dangle": "off",
