@@ -18,6 +18,8 @@ async def getNextSequence(name: str, request: Request):
 
     return f"{ret['seq']}"
 
+
+
 @router.get("/", response_description="List all category")
 async def list_category(request: Request):
     categories = []
@@ -79,3 +81,19 @@ async def delete_category(id: int, request: Request):
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail=f"category {id} not found")
+
+@router.get("/check-category/{name}")
+async def check_category(name: str, request: Request):
+    for category in await list_category(request):
+        if category['name'].lower() == name.lower():
+            return True
+
+    return False
+
+@router.get("/check-category/{name}/{id}")
+async def check_category(name: str, id: int, request: Request):
+    for category in await list_category(request):
+        if category['name'].lower() == name.lower() & category['_id'] != id:
+            return True
+
+    return False

@@ -69,9 +69,19 @@ const UserForm = () => {
   };
 
   const checkUserExist = () => {
-    axios
-      .get(`http://localhost:8000/user/check-user/${values.username}`)
-      .then((res) => setUserExist(res.data));
+    if (params.has('id')) {
+      axios
+        .get(
+          `http://localhost:8000/user/check-user/${
+            values.username
+          }/${params.get('id')}`
+        )
+        .then((res) => setUserExist(res.data));
+    } else {
+      axios
+        .get(`http://localhost:8000/user/check-user/${values.username}`)
+        .then((res) => setUserExist(res.data));
+    }
   };
 
   const params = new URL(document.location).searchParams;
@@ -109,6 +119,7 @@ const UserForm = () => {
             authLevel: values.authLevel
           })
           .then((res) => console.log(res));
+        window.alert('Update successfully!!');
       } else {
         const currentDate = Math.floor(new Date().getTime() / 1000);
         axios
@@ -122,8 +133,9 @@ const UserForm = () => {
             authLevel: values.authLevel
           })
           .then((res) => console.log(res));
+        window.alert('Insert successfully!!');
+        resetForm();
       }
-      resetForm();
     }
   };
 
@@ -136,7 +148,6 @@ const UserForm = () => {
           <Grid container spacing={3}>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
                 helperText="Username"
                 label="Username"
                 name="username"
@@ -153,13 +164,9 @@ const UserForm = () => {
                   checkUserExist();
                 }}
               />
-              {errors.length > 0 ? (
-                <div className="has-error">{errors.join(', ')}</div>
-              ) : null}
             </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
                 helperText="Password"
                 label="Password"
                 name="password"
@@ -176,7 +183,6 @@ const UserForm = () => {
             </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
                 id="date"
                 required
                 name="date_of_birth"
@@ -192,7 +198,6 @@ const UserForm = () => {
             </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
                 label="Email Address"
                 name="email"
                 type="text"
@@ -208,7 +213,6 @@ const UserForm = () => {
             </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
                 label="Gender"
                 name="gender"
                 onChange={handleInputChange}
@@ -229,7 +233,6 @@ const UserForm = () => {
             </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
                 label="AuthLevel"
                 name="authLevel"
                 onChange={handleInputChange}

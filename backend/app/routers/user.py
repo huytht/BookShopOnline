@@ -3,9 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from datetime import datetime
 from ..models.user import UserModel, UserUpdateModel
-from dateutil import parser
-import calendar
-from bson.timestamp import Timestamp
+from typing import Optional
 
 router = APIRouter()
 
@@ -75,6 +73,15 @@ async def delete_user(id: str, request: Request):
 async def check_user(username: str, request: Request):
     for user in await list_users(request):
         if user['username'] == username:
+            return True
+
+    return False
+
+@router.get("/check-user/{username}/{id}")
+async def check_user(username: str, id: str, request: Request):
+
+    for user in await list_users(request):
+        if user['username'] == username & user['_id'] != id:
             return True
 
     return False
