@@ -4,30 +4,24 @@ from fastapi import APIRouter, Body, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from ..models.book import BookModel, BookUpdateModel
+from ..routers.category import list_category
 
 router = APIRouter()
 
-def defaultconverter(o):
-  if isinstance(o, datetime):
-      return o.__str__()
+TIME_FORMAT='%Y-%m-%dT%H:%M:%S'
 
 @router.get("/", response_description="List all book")
 async def list_books(request: Request):
     books = []
-    categories = []
-    
-    for cate in await request.app.mongodb["category"].find().to_list(length=100):
-        categories.append(cate)
 
     for book in await request.app.mongodb["book"].find().to_list(length=100):
         category_name = []
         for category_id in book['category_id']:
-            for cate in categories:
+            for cate in await list_category(request):
                 if cate['_id'] == category_id:
                     category_name.append(cate['name'])
                     break
         book['category_id'] = category_name
-        book['published_date'] = book['published_date'].strftime("%d/%m/%Y")
         books.append(book)
 
     return books
@@ -42,8 +36,7 @@ async def get_book(id: str, request: Request):
 @router.post("/create-book/")
 async def create_book(request: Request, book: BookModel = Body(...)):
     book = jsonable_encoder(book)
-    # book['published_date'] = datetime.strptime(book['published_date'], "%Y-%m-%d %H:%M:%S")
-    # book = json.dumps(book, default = defaultconverter)
+    book['published_date'] = datetime.strptime(book['published_date'], TIME_FORMAT + "+00:00").timestamp()
     new_book = await request.app.mongodb["book"].insert_one(book)
     created_book = await request.app.mongodb["book"].find_one(
         {"_id": new_book.inserted_id}
@@ -56,6 +49,7 @@ async def update_book(id: str, request: Request, book: BookUpdateModel = Body(..
     book = {k: v for k, v in book.dict().items() if v is not None}
 
     if (len(book) >= 1):
+        book['published_date'] = book['published_date'].timestamp()        
         update_book_result = await request.app.mongodb["book"].update_one(
             {"_id": id},
             {"$set": book}

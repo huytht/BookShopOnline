@@ -70,3 +70,11 @@ async def delete_user(id: str, request: Request):
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail=f"user {id} not found")
+
+@router.get("/check-user/{username}")
+async def check_user(username: str, request: Request):
+    for user in await list_users(request):
+        if user['username'] == username:
+            return True
+
+    return False
