@@ -6,11 +6,12 @@ import {
   CardContent,
   CardHeader,
   Divider,
-  Grid,
-  TextField
+  Grid
 } from '@material-ui/core';
 import axios from 'axios';
 import moment from 'moment';
+import Controls from '../controls/Controls';
+import { useForm, Form } from '../useForm';
 
 const AuthLevel = [
   {
@@ -39,7 +40,7 @@ const gender = [
 ];
 
 const UserForm = () => {
-  const [values, setValues] = useState({
+  const initValues = {
     username: '',
     password: '',
     date_of_birth: '',
@@ -47,7 +48,31 @@ const UserForm = () => {
     email: '',
     gender: 0,
     authLevel: 'customer'
-  });
+  };
+  const [userExist, setUserExist] = useState(false);
+
+  const validate = () => {
+    const temp = {};
+    temp.username = userExist ? 'Username has exist.' : '';
+    temp.password =
+      /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/.test(
+        values.password
+      )
+        ? ''
+        : 'Password must be 6 to 16 character, at least a number and at least a special character.';
+    temp.email = /$^|.+@.+..+/.test(values.email) ? '' : 'Email is not valid.';
+    setErrors({
+      ...temp
+    });
+
+    return Object.values(temp).every((x) => x === '');
+  };
+
+  const checkUserExist = () => {
+    axios
+      .get(`http://localhost:8000/user/check-user/${values.username}`)
+      .then((res) => setUserExist(res.data));
+  };
 
   const params = new URL(document.location).searchParams;
   if (params.has('id')) {
@@ -66,92 +91,98 @@ const UserForm = () => {
     }, []);
   }
 
-  const handleChange = (event) => {
-    setValues({
-      ...values,
-      [event.target.name]: event.target.value
-    });
-  };
+  const { values, setValues, errors, setErrors, handleInputChange, resetForm } =
+    useForm(initValues, true, validate);
 
   const submitFormHandler = (event) => {
     event.preventDefault();
-    const dob = Math.floor(new Date(values.date_of_birth).getTime() / 1000);
-    if (params.has('id')) {
-      axios
-        .put(`http://localhost:8000/user/update-user/${params.get('id')}`, {
-          username: values.username,
-          password: values.password,
-          date_of_birth: dob,
-          email: values.email,
-          gender: parseInt(values.gender, 10),
-          authLevel: values.authLevel
-        })
-        .then((res) => console.log(res));
-      // setValues('');
-    } else {
-      const currentDate = Math.floor(new Date().getTime() / 1000);
-      axios
-        .post('http://localhost:8000/user/create-user/', {
-          username: values.username,
-          password: values.password,
-          date_of_birth: dob,
-          registration_date: currentDate,
-          email: values.email,
-          gender: parseInt(values.gender, 10),
-          authLevel: values.authLevel
-        })
-        .then((res) => console.log(res));
-      // setValues('');
-      // console.log();
+    if (validate()) {
+      const dob = Math.floor(new Date(values.date_of_birth).getTime() / 1000);
+      if (params.has('id')) {
+        axios
+          .put(`http://localhost:8000/user/update-user/${params.get('id')}`, {
+            username: values.username,
+            password: values.password,
+            date_of_birth: dob,
+            email: values.email,
+            gender: parseInt(values.gender, 10),
+            authLevel: values.authLevel
+          })
+          .then((res) => console.log(res));
+      } else {
+        const currentDate = Math.floor(new Date().getTime() / 1000);
+        axios
+          .post('http://localhost:8000/user/create-user/', {
+            username: values.username,
+            password: values.password,
+            date_of_birth: dob,
+            registration_date: currentDate,
+            email: values.email,
+            gender: parseInt(values.gender, 10),
+            authLevel: values.authLevel
+          })
+          .then((res) => console.log(res));
+      }
+      resetForm();
     }
   };
 
   return (
-    <form autoComplete="off" onSubmit={submitFormHandler}>
+    <Form onSubmit={submitFormHandler}>
       <Card>
         <CardHeader subheader="The information can be add" title="USER FORM" />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
             <Grid item md={6} xs={12}>
-              <TextField
+              <Controls.Input
                 fullWidth
                 helperText="Username"
                 label="Username"
                 name="username"
-                onChange={handleChange}
+                onChange={handleInputChange}
                 required
+                error={errors.username}
                 InputLabelProps={{
                   shrink: true
                 }}
+                inputProps={params.has('id') ? { readOnly: true } : ''}
                 value={values.username}
                 variant="outlined"
+                onBlur={() => {
+                  checkUserExist();
+                }}
               />
+              {errors.length > 0 ? (
+                <div className="has-error">{errors.join(', ')}</div>
+              ) : null}
             </Grid>
             <Grid item md={6} xs={12}>
-              <TextField
+              <Controls.Input
                 fullWidth
                 helperText="Password"
                 label="Password"
                 name="password"
                 type="password"
+                error={errors.password}
                 InputLabelProps={{
                   shrink: true
                 }}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 required
                 value={values.password}
                 variant="outlined"
               />
             </Grid>
             <Grid item md={6} xs={12}>
-              <TextField
+              <Controls.Input
                 fullWidth
                 id="date"
+                required
                 name="date_of_birth"
                 label="Date of birth"
                 type="date"
-                onChange={handleChange}
+                onChange={handleInputChange}
                 value={values.date_of_birth}
                 InputLabelProps={{
                   shrink: true
@@ -160,26 +191,27 @@ const UserForm = () => {
               />
             </Grid>
             <Grid item md={6} xs={12}>
-              <TextField
+              <Controls.Input
                 fullWidth
                 label="Email Address"
                 name="email"
                 type="text"
+                error={errors.email}
                 InputLabelProps={{
                   shrink: true
                 }}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 required
                 value={values.email}
                 variant="outlined"
               />
             </Grid>
             <Grid item md={6} xs={12}>
-              <TextField
+              <Controls.Input
                 fullWidth
                 label="Gender"
                 name="gender"
-                onChange={handleChange}
+                onChange={handleInputChange}
                 select
                 InputLabelProps={{
                   shrink: true
@@ -193,14 +225,14 @@ const UserForm = () => {
                     {option.label}
                   </option>
                 ))}
-              </TextField>
+              </Controls.Input>
             </Grid>
             <Grid item md={6} xs={12}>
-              <TextField
+              <Controls.Input
                 fullWidth
                 label="AuthLevel"
                 name="authLevel"
-                onChange={handleChange}
+                onChange={handleInputChange}
                 select
                 InputLabelProps={{
                   shrink: true
@@ -214,7 +246,7 @@ const UserForm = () => {
                     {option.label}
                   </option>
                 ))}
-              </TextField>
+              </Controls.Input>
             </Grid>
           </Grid>
         </CardContent>
@@ -231,7 +263,7 @@ const UserForm = () => {
           </Button>
         </Box>
       </Card>
-    </form>
+    </Form>
   );
 };
 

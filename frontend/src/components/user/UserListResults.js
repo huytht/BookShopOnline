@@ -141,7 +141,6 @@ const UserListResults = ({ users }) => {
                     </IconButton>
                   </TableCell>
                   <TableCell>
-                    {/* onClick={deleteUserHandler(user._id)} */}
                     <IconButton>
                       <DeleteIcon
                         onClick={() => {
