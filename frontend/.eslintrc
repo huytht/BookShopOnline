@@ -23,7 +23,10 @@
   "rules": {
     "no-unused-vars": "off",
     "react/prop-types": "off",
+    "react/destructuring-assignment": "off",
+    "no-use-before-define": "off",
     "object-curly-newline": "off",
+    "consistent-return": "off",
     "linebreak-style": "off",
     "operator-linebreak": "off",
     "no-underscore-dangle": "off",
