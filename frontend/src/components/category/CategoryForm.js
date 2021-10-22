@@ -6,94 +6,118 @@ import {
   CardContent,
   CardHeader,
   Divider,
-  Grid,
-  TextField
+  Grid
 } from '@material-ui/core';
 import axios from 'axios';
 import moment from 'moment';
+import Controls from '../controls/Controls';
+import { useForm, Form } from '../useForm';
 
 const CategoryForm = () => {
-  const [values, setValues] = useState({
-    username: ''
-  });
+  const initValues = {
+    name: ''
+  };
+
+  const [categoryExist, setCategoryExist] = useState(false);
+
+  const validate = () => {
+    const temp = {};
+    temp.name = categoryExist ? 'Name has exist.' : '';
+
+    setErrors({
+      ...temp
+    });
+    return Object.values(temp).every((x) => x === '');
+  };
+
+  const checkCategoryExist = () => {
+    if (params.has('id')) {
+      axios
+        .get(
+          `http://localhost:8000/category/check-category/${
+            values.name
+          }/${params.get('id')}`
+        )
+        .then((res) => setCategoryExist(res.data));
+    } else {
+      axios
+        .get(`http://localhost:8000/category/check-category/${values.name}`)
+        .then((res) => setCategoryExist(res.data));
+    }
+  };
 
   const params = new URL(document.location).searchParams;
   if (params.has('id')) {
     useEffect(() => {
-      const fetchUserData = async () => {
+      const fetchCategoryData = async () => {
         const response = await fetch(
-          `http://localhost:8000/user/get-user/${params.get('id')}`
+          `http://localhost:8000/category/get-category/${params.get('id')}`
         );
-        const fetchedUser = await response.json();
-        fetchedUser.date_of_birth = moment
-          .unix(fetchedUser.date_of_birth)
-          .format('yyyy-MM-DD');
-        setValues(fetchedUser);
+        const fetchedCategory = await response.json();
+
+        setValues(fetchedCategory);
       };
-      fetchUserData();
+      fetchCategoryData();
     }, []);
   }
 
-  const handleChange = (event) => {
-    setValues({
-      ...values,
-      [event.target.name]: event.target.value
-    });
-  };
+  const { values, setValues, errors, setErrors, handleInputChange, resetForm } =
+    useForm(initValues, true, validate);
 
   const submitFormHandler = (event) => {
     event.preventDefault();
-    const dob = Math.floor(new Date(values.date_of_birth).getTime() / 1000);
-    if (params.has('id')) {
-      axios
-        .put(`http://localhost:8000/user/update-user/${params.get('id')}`, {
-          username: values.username,
-          password: values.password,
-          date_of_birth: dob,
-          email: values.email,
-          gender: parseInt(values.gender, 10),
-          authLevel: values.authLevel
-        })
-        .then((res) => console.log(res));
-      // setValues('');
-    } else {
-      const currentDate = Math.floor(new Date().getTime() / 1000);
-      axios
-        .post('http://localhost:8000/user/create-user/', {
-          username: values.username,
-          password: values.password,
-          date_of_birth: dob,
-          registration_date: currentDate,
-          email: values.email,
-          gender: parseInt(values.gender, 10),
-          authLevel: values.authLevel
-        })
-        .then((res) => console.log(res));
-      // setValues('');
-      // console.log();
+    if (validate()) {
+      if (params.has('id')) {
+        axios
+          .put(
+            `http://localhost:8000/category/update-category/${params.get(
+              'id'
+            )}`,
+            {
+              name: values.name
+            }
+          )
+          .then((res) => console.log(res));
+        window.alert('Update successfully!!');
+      } else {
+        axios
+          .post('http://localhost:8000/category/create-category/', {
+            name: values.name
+          })
+          .then((res) => console.log(res));
+        window.alert('Insert successfully!!');
+
+        resetForm();
+      }
     }
   };
 
   return (
-    <form autoComplete="off" onSubmit={submitFormHandler}>
+    <Form onSubmit={submitFormHandler}>
       <Card>
-        <CardHeader subheader="The information can be add" title="CATEGORY FORM" />
+        <CardHeader
+          subheader="The information can be add"
+          title="CATEGORY FORM"
+        />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
             <Grid item md={12} xs={12}>
-              <TextField
-                fullWidth
+              <Controls.Input
                 helperText="Name Category"
-                label="Category"
-                name="username"
-                onChange={handleChange}
+                label="Name"
+                name="name"
+                error={errors.name}
+                onChange={handleInputChange}
                 required
                 InputLabelProps={{
                   shrink: true
                 }}
-                value={values.username}
+                value={values.name}
                 variant="outlined"
+                onBlur={() => {
+                  checkCategoryExist();
+                }}
               />
             </Grid>
           </Grid>
@@ -111,7 +135,7 @@ const CategoryForm = () => {
           </Button>
         </Box>
       </Card>
-    </form>
+    </Form>
   );
 };
 

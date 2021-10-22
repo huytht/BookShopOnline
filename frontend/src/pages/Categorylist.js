@@ -6,18 +6,18 @@ import CategoryResult from '../components/category/CategoryResult';
 import CategoryToolbar from '../components/category/CategoryToolbar';
 
 const Categorylist = () => {
-  const [users, setUsers] = useState([]);
-  // Read all user
+  const [categories, setCategories] = useState([]);
+  // Read all category
   useEffect(() => {
-    axios.get('http://localhost:8000/user/').then((res) => {
-      setUsers(res.data);
+    axios.get('http://localhost:8000/category/').then((res) => {
+      setCategories(res.data);
     });
-    const interval = setInterval(users, 1000);
+    const interval = setInterval(categories, 1000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [users]);
+  }, [categories]);
   return (
     <>
       <Helmet>
@@ -33,7 +33,7 @@ const Categorylist = () => {
         <Container maxWidth={false}>
           <CategoryToolbar />
           <Box sx={{ pt: 3 }}>
-            <CategoryResult users={users} />
+            <CategoryResult categories={categories} />
           </Box>
         </Container>
       </Box>
