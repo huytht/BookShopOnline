@@ -16,11 +16,11 @@ import {
   BarChart as BarChartIcon,
   Lock as LockIcon,
   Settings as SettingsIcon,
-  ShoppingBag as ShoppingBagIcon,
   User as UserIcon,
   UserPlus as UserPlusIcon,
   Users as UsersIcon,
-  Book as BookIcon
+  Book as BookIcon,
+  BookOpen as BookOpenIcon
 } from 'react-feather';
 import NavItem from './NavItem';
 
@@ -47,9 +47,9 @@ const items = [
     title: 'Category'
   },
   {
-    href: '/app/products',
-    icon: ShoppingBagIcon,
-    title: 'Products'
+    href: '/app/Book',
+    icon: BookOpenIcon,
+    title: 'Book'
   },
   {
     href: '/app/account',

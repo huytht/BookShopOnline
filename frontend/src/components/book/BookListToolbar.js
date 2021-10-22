@@ -1,3 +1,4 @@
+import { Link as RouterLink } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -9,7 +10,7 @@ import {
 } from '@material-ui/core';
 import { Search as SearchIcon } from 'react-feather';
 
-const ProductListToolbar = (props) => (
+const BookListToolbar = (props) => (
   <Box {...props}>
     <Box
       sx={{
@@ -26,6 +27,8 @@ const ProductListToolbar = (props) => (
       <Button
         color="primary"
         variant="contained"
+        component={RouterLink}
+        to="/app/book-form"
       >
         Add product
       </Button>
@@ -58,4 +61,4 @@ const ProductListToolbar = (props) => (
   </Box>
 );
 
-export default ProductListToolbar;
+export default BookListToolbar;

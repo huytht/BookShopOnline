@@ -6,12 +6,13 @@ import UserList from './pages/UserList';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
-import ProductList from './pages/ProductList';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
 import UserForm from './components/user/UserForm';
 import CategoryForm from './components/category/CategoryForm';
 import Categorylist from './pages/Categorylist';
+import BookList from './pages/BookList';
+import BookForm from './components/book/BookForm';
 
 const routes = [
   {
@@ -24,7 +25,8 @@ const routes = [
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'user-form', element: <UserForm /> },
       { path: 'category-form', element: <CategoryForm /> },
-      { path: 'products', element: <ProductList /> },
+      { path: 'book', element: <BookList /> },
+      { path: 'book-form', element: <BookForm /> },
       { path: 'settings', element: <Settings /> },
       { path: '*', element: <Navigate to="/404" /> }
     ]
