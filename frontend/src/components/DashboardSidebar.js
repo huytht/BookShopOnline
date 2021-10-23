@@ -20,7 +20,8 @@ import {
   UserPlus as UserPlusIcon,
   Users as UsersIcon,
   Book as BookIcon,
-  BookOpen as BookOpenIcon
+  BookOpen as BookOpenIcon,
+  CreditCard as CreditCardIcon
 } from 'react-feather';
 import NavItem from './NavItem';
 
@@ -47,9 +48,14 @@ const items = [
     title: 'Category'
   },
   {
-    href: '/app/Book',
+    href: '/app/book',
     icon: BookOpenIcon,
     title: 'Book'
+  },
+  {
+    href: '/app/payment',
+    icon: CreditCardIcon,
+    title: 'Payment'
   },
   {
     href: '/app/account',

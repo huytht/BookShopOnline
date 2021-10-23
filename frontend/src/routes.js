@@ -13,6 +13,8 @@ import CategoryForm from './components/category/CategoryForm';
 import Categorylist from './pages/Categorylist';
 import BookList from './pages/BookList';
 import BookForm from './components/book/BookForm';
+import PaymentList from './pages/PaymentList';
+import PaymentForm from './components/payment/PaymentForm';
 
 const routes = [
   {
@@ -27,6 +29,8 @@ const routes = [
       { path: 'category-form', element: <CategoryForm /> },
       { path: 'book', element: <BookList /> },
       { path: 'book-form', element: <BookForm /> },
+      { path: 'payment', element: <PaymentList /> },
+      { path: 'payment-form', element: <PaymentForm /> },
       { path: 'settings', element: <Settings /> },
       { path: '*', element: <Navigate to="/404" /> }
     ]
