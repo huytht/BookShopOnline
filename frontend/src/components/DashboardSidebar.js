@@ -21,7 +21,11 @@ import {
   Users as UsersIcon,
   Book as BookIcon,
   BookOpen as BookOpenIcon,
-  CreditCard as CreditCardIcon
+  CreditCard as CreditCardIcon,
+  FileText as FileTextIcon,
+  FileMinus as FileMinusIcon,
+  BarChart2 as BarChar2Icon,
+  BarChart2
 } from 'react-feather';
 import NavItem from './NavItem';
 
@@ -56,6 +60,26 @@ const items = [
     href: '/app/payment',
     icon: CreditCardIcon,
     title: 'Payment'
+  },
+  {
+    href: '/app/invoice',
+    icon: FileTextIcon,
+    title: 'Invoice'
+  },
+  {
+    href: '/app/invoicedetails',
+    icon: FileMinusIcon,
+    title: 'Invoice Details'
+  },
+  {
+    href: '/app/reviewbook',
+    icon: BarChart2,
+    title: 'Review Book'
+  },
+  {
+    href: '/app/totalrevenue',
+    icon: BarChart2,
+    title: 'Total Revenue'
   },
   {
     href: '/app/account',
