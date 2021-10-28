@@ -24,8 +24,8 @@ import {
   CreditCard as CreditCardIcon,
   FileText as FileTextIcon,
   FileMinus as FileMinusIcon,
-  BarChart2 as BarChar2Icon,
-  BarChart2
+  BarChart2,
+  Layers,
 } from 'react-feather';
 import NavItem from './NavItem';
 
@@ -78,8 +78,8 @@ const items = [
   },
   {
     href: '/app/totalrevenue',
-    icon: BarChart2,
-    title: 'Total Revenue'
+    icon: Layers,
+    title: 'Total Revenu'
   },
   {
     href: '/app/account',
