@@ -13,6 +13,7 @@ class BookModel(BaseModel):
     price: int = Field(...)
     image: str = Field(...)
     category_id = []
+    isSold: Optional[bool] = Field(default_factory=False)
 
     class Config:
         allow_population_by_field_name = True
@@ -39,6 +40,7 @@ class BookUpdateModel(BaseModel):
     price: Optional[int]
     image: Optional[str]
     category_id = []
+    isSold: Optional[bool]
 
     class Config:
         allow_population_by_field_name = True
@@ -51,6 +53,7 @@ class BookUpdateModel(BaseModel):
                 "published_date": datetime(2021, 10, 7, 0, 0 , 0),
                 "price": 20000,
                 "image": "abc.jpg",
-                "category_id": [1, 2]
+                "category_id": [1, 2],
+                "isSold": False
             }
         } 

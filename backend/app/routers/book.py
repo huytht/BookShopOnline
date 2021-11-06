@@ -1,5 +1,4 @@
 from datetime import datetime
-import json
 from fastapi import APIRouter, Body, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -76,3 +75,19 @@ async def delete_book(id: str, request: Request):
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail=f"book {id} not found")
+
+@router.get('/check-book/{isbn}')
+async def check_book(isbn: str, request: Request):
+    for book in await list_books(request):
+        if book['isbn'] == isbn:
+            return True
+
+    return False
+
+@router.get('/check-book/{isbn}/{id}')
+async def check_book(isbn: str, id: str, request: Request):
+    for book in await list_books(request):
+        if book['isbn'] == isbn & book['_id'] != id:
+            return True
+
+    return False

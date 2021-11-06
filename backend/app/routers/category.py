@@ -1,11 +1,10 @@
-from fastapi import APIRouter, Body, Request, HTTPException, status, Response
+from fastapi import APIRouter, Body, Request, HTTPException, status, Response, Form
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from pydantic.networks import HttpUrl
 from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi.logger import logger
 from ..models.category import CategoryModel, CategoryUpdateModel
-
+from typing import List
 router = APIRouter()
 
 async def getNextSequence(name: str, request: Request):
@@ -35,6 +34,20 @@ async def get_category(id: int, request: Request):
         return category
     
     raise HTTPException(status_code=404, detail="category {id} not found")
+
+@router.post("/get-list-category/", response_description="Get category detail")
+async def get_list_category(request: Request):
+    request_data = await request.json()
+    idList = request_data['idList']
+    listCate = []
+    for id in idList:
+        if (category := await request.app.mongodb["category"].find_one({"_id": id})) is not None:
+            listCate.append(category)
+
+    if listCate is not None:
+        return listCate 
+    
+    raise HTTPException(status_code=404, detail="category not found")
 
 @router.post("/create-category/")
 async def create_category(request: Request, category: CategoryModel = Body(...)):
