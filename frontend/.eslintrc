@@ -41,6 +41,13 @@
     "react/jsx-filename-extension": "off",
     "react/jsx-props-no-spreading": "off",
     "react/react-in-jsx-scope": "off",
-    "react/require-default-props": "off"
+    "react/require-default-props": "off",
+    "function-paren-newline": "off",
+    "implicit-arrow-linebreak": "off",
+    "no-confusing-arrow": "off",
+    "react/jsx-curly-newline": "off",
+    "react/jsx-boolean-value": "off",
+    "arrow-body-style": "off",
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
   }
 }
