@@ -44,7 +44,7 @@ const CategoryToolbar = (props) => (
                   </InputAdornment>
                 )
               }}
-              placeholder="Search user"
+              placeholder="Search category"
               variant="outlined"
             />
           </Box>

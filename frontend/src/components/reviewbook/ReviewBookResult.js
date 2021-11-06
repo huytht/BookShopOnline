@@ -19,44 +19,9 @@ import {
 } from '@material-ui/core';
 import axios from 'axios';
 
-const ReviewBookResult = ({ users }) => {
-  const [selectedUserIds, setSelectedUserIds] = useState([]);
+const ReviewBookResult = ({ reviews }) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-
-  const handleSelectAll = (event) => {
-    let newSelectedUserIds;
-
-    if (event.target.checked) {
-      newSelectedUserIds = users.map((user) => user.id);
-    } else {
-      newSelectedUserIds = [];
-    }
-
-    setSelectedUserIds(newSelectedUserIds);
-  };
-
-  const handleSelectOne = (event, id) => {
-    const selectedIndex = selectedUserIds.indexOf(id);
-    let newSelectedUserIds = [];
-
-    if (selectedIndex === -1) {
-      newSelectedUserIds = newSelectedUserIds.concat(selectedUserIds, id);
-    } else if (selectedIndex === 0) {
-      newSelectedUserIds = newSelectedUserIds.concat(selectedUserIds.slice(1));
-    } else if (selectedIndex === selectedUserIds.length - 1) {
-      newSelectedUserIds = newSelectedUserIds.concat(
-        selectedUserIds.slice(0, -1)
-      );
-    } else if (selectedIndex > 0) {
-      newSelectedUserIds = newSelectedUserIds.concat(
-        selectedUserIds.slice(0, selectedIndex),
-        selectedUserIds.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelectedUserIds(newSelectedUserIds);
-  };
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -73,53 +38,21 @@ const ReviewBookResult = ({ users }) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedUserIds.length === users.length}
-                    color="primary"
-                    indeterminate={
-                      selectedUserIds.length > 0 &&
-                      selectedUserIds.length < users.length
-                    }
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
-                <TableCell>Book_id</TableCell>
-                <TableCell>User_id</TableCell>
+                <TableCell>Username</TableCell>
+                <TableCell>Title book</TableCell>
                 <TableCell>Rate</TableCell>
                 <TableCell>Remark</TableCell>
                 <TableCell>Favourite</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.slice(0, limit).map((user) => (
-                <TableRow
-                  hover
-                  key={user._id}
-                  selected={selectedUserIds.indexOf(user._id) !== -1}
-                >
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedUserIds.indexOf(user._id) !== -1}
-                      onChange={(event) => handleSelectOne(event, user._id)}
-                      value="true"
-                    />
-                  </TableCell>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    {user.gender === 0
-                      ? 'Nam'
-                      : user.gender === 1
-                      ? 'Nữ'
-                      : 'Khác'}
-                  </TableCell>
-                  <TableCell>
-                    {moment.unix(user.date_of_birth).format('DD/MM/yyyy')}
-                  </TableCell>
-                  <TableCell>
-                    {moment.unix(user.date_of_birth).format('DD/MM/yyyy')}
-                  </TableCell>
+              {reviews.slice(0, limit).map((review) => (
+                <TableRow hover key={review._id}>
+                  <TableCell>{review.user_username}</TableCell>
+                  <TableCell>{review.book_title}</TableCell>
+                  <TableCell>{review.rate}</TableCell>
+                  <TableCell>{review.remark}</TableCell>
+                  <TableCell>{review.favourite ? 'true' : 'false'}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -128,7 +61,7 @@ const ReviewBookResult = ({ users }) => {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={users.length}
+        count={reviews.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -140,7 +73,7 @@ const ReviewBookResult = ({ users }) => {
 };
 
 ReviewBookResult.propTypes = {
-  users: PropTypes.array.isRequired
+  reviews: PropTypes.array.isRequired
 };
 
 export default ReviewBookResult;

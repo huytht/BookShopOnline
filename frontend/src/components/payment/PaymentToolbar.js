@@ -44,7 +44,7 @@ const PaymentToolbar = (props) => (
                   </InputAdornment>
                 )
               }}
-              placeholder="Search user"
+              placeholder="Search payment"
               variant="outlined"
             />
           </Box>

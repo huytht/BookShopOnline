@@ -51,7 +51,7 @@ const BookListToolbar = (props) => (
                   </InputAdornment>
                 )
               }}
-              placeholder="Search product"
+              placeholder="Search book"
               variant="outlined"
             />
           </Box>

@@ -6,18 +6,18 @@ import InvoiceDetailsResult from '../components/invoice_details/InvoiceDetailsRe
 import InvoiceDetailsToolbar from '../components/invoice_details/InvoiceDetailsToolbar';
 
 const InvoiceDetailsList = () => {
-  const [users, setUsers] = useState([]);
-  // Read all user
+  const [invoiceDetails, setInvoiceDetails] = useState([]);
+  // Read all invoiceDetail
   useEffect(() => {
-    axios.get('http://localhost:8000/user/').then((res) => {
-      setUsers(res.data);
+    axios.get('http://localhost:8000/invoice-detail/').then((res) => {
+      setInvoiceDetails(res.data);
     });
-    const interval = setInterval(users, 1000);
+    const interval = setInterval(invoiceDetails, 1000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [users]);
+  }, [invoiceDetails]);
   return (
     <>
       <Helmet>
@@ -33,7 +33,7 @@ const InvoiceDetailsList = () => {
         <Container maxWidth={false}>
           <InvoiceDetailsToolbar />
           <Box sx={{ pt: 3 }}>
-            <InvoiceDetailsResult users={users} />
+            <InvoiceDetailsResult invoiceDetails={invoiceDetails} />
           </Box>
         </Container>
       </Box>

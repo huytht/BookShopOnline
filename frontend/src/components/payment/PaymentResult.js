@@ -19,54 +19,14 @@ import {
 } from '@material-ui/core';
 import axios from 'axios';
 
-const PaymentResult = ({ categories }) => {
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
+const PaymentResult = ({ payments }) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
-  const deleteCategoryHandler = (id) => {
+  const deletePaymentHandler = (id) => {
     axios
-      .delete(`http://localhost:8000/category/delete-category/${id}`)
+      .delete(`http://localhost:8000/payment/delete-payment/${id}`)
       .then((res) => console.log(res));
-  };
-
-  const handleSelectAll = (event) => {
-    let newSelectedCategoryIds;
-
-    if (event.target.checked) {
-      newSelectedCategoryIds = categories.map((category) => category.id);
-    } else {
-      newSelectedCategoryIds = [];
-    }
-
-    setSelectedCategoryIds(newSelectedCategoryIds);
-  };
-
-  const handleSelectOne = (event, id) => {
-    const selectedIndex = selectedCategoryIds.indexOf(id);
-    let newSelectedCategoryIds = [];
-
-    if (selectedIndex === -1) {
-      newSelectedCategoryIds = newSelectedCategoryIds.concat(
-        selectedCategoryIds,
-        id
-      );
-    } else if (selectedIndex === 0) {
-      newSelectedCategoryIds = newSelectedCategoryIds.concat(
-        selectedCategoryIds.slice(1)
-      );
-    } else if (selectedIndex === selectedCategoryIds.length - 1) {
-      newSelectedCategoryIds = newSelectedCategoryIds.concat(
-        selectedCategoryIds.slice(0, -1)
-      );
-    } else if (selectedIndex > 0) {
-      newSelectedCategoryIds = newSelectedCategoryIds.concat(
-        selectedCategoryIds.slice(0, selectedIndex),
-        selectedCategoryIds.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelectedCategoryIds(newSelectedCategoryIds);
   };
 
   const handleLimitChange = (event) => {
@@ -84,17 +44,6 @@ const PaymentResult = ({ categories }) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedCategoryIds.length === categories.length}
-                    color="primary"
-                    indeterminate={
-                      selectedCategoryIds.length > 0 &&
-                      selectedCategoryIds.length < categories.length
-                    }
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
                 <TableCell style={{ textAlign: 'center' }}>Name</TableCell>
                 <TableCell colSpan={2} style={{ textAlign: 'center' }}>
                   Action
@@ -102,32 +51,21 @@ const PaymentResult = ({ categories }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {categories.slice(0, limit).map((category) => (
-                <TableRow
-                  hover
-                  key={category._id}
-                  selected={selectedCategoryIds.indexOf(category._id) !== -1}
-                >
-                  <TableCell padding="checkbox" style={{ textAlign: 'center' }}>
-                    <Checkbox
-                      checked={selectedCategoryIds.indexOf(category._id) !== -1}
-                      onChange={(event) => handleSelectOne(event, category._id)}
-                      value="true"
-                    />
-                  </TableCell>
+              {payments.slice(0, limit).map((payment) => (
+                <TableRow hover key={payment._id}>
                   <TableCell style={{ textAlign: 'center' }}>
-                    {category.name}
+                    {payment.name}
                   </TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
                     <IconButton
                       component={RouterLink}
-                      to={`/app/category-form?id=${category._id}`}
+                      to={`/app/payment-form?id=${payment._id}`}
                     >
                       <EditIcon />
                     </IconButton>
                     <IconButton
                       onClick={() => {
-                        deleteCategoryHandler(category._id);
+                        deletePaymentHandler(payment._id);
                       }}
                     >
                       <DeleteIcon />
@@ -141,7 +79,7 @@ const PaymentResult = ({ categories }) => {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={categories.length}
+        count={payments.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -153,7 +91,7 @@ const PaymentResult = ({ categories }) => {
 };
 
 PaymentResult.propTypes = {
-  categories: PropTypes.array.isRequired
+  payments: PropTypes.array.isRequired
 };
 
 export default PaymentResult;

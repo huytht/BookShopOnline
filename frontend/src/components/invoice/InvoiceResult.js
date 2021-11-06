@@ -19,43 +19,14 @@ import {
 } from '@material-ui/core';
 import axios from 'axios';
 
-const InvoiceResult = ({ users }) => {
-  const [selectedUserIds, setSelectedUserIds] = useState([]);
+const InvoiceResult = ({ invoices }) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
-  const handleSelectAll = (event) => {
-    let newSelectedUserIds;
-
-    if (event.target.checked) {
-      newSelectedUserIds = users.map((user) => user.id);
-    } else {
-      newSelectedUserIds = [];
-    }
-
-    setSelectedUserIds(newSelectedUserIds);
-  };
-
-  const handleSelectOne = (event, id) => {
-    const selectedIndex = selectedUserIds.indexOf(id);
-    let newSelectedUserIds = [];
-
-    if (selectedIndex === -1) {
-      newSelectedUserIds = newSelectedUserIds.concat(selectedUserIds, id);
-    } else if (selectedIndex === 0) {
-      newSelectedUserIds = newSelectedUserIds.concat(selectedUserIds.slice(1));
-    } else if (selectedIndex === selectedUserIds.length - 1) {
-      newSelectedUserIds = newSelectedUserIds.concat(
-        selectedUserIds.slice(0, -1)
-      );
-    } else if (selectedIndex > 0) {
-      newSelectedUserIds = newSelectedUserIds.concat(
-        selectedUserIds.slice(0, selectedIndex),
-        selectedUserIds.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelectedUserIds(newSelectedUserIds);
+  const deleteInvoiceHandler = (id) => {
+    axios
+      .delete(`http://localhost:8000/invoice/delete-invoice/${id}`)
+      .then((res) => console.log(res));
   };
 
   const handleLimitChange = (event) => {
@@ -73,49 +44,21 @@ const InvoiceResult = ({ users }) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedUserIds.length === users.length}
-                    color="primary"
-                    indeterminate={
-                      selectedUserIds.length > 0 &&
-                      selectedUserIds.length < users.length
-                    }
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
-                <TableCell>User_id</TableCell>
-                <TableCell>Created_date</TableCell>
+                <TableCell>Username</TableCell>
+                <TableCell>Created Date</TableCell>
                 <TableCell>Total</TableCell>
-                <TableCell>Payment_id</TableCell>
+                <TableCell>Payment</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.slice(0, limit).map((user) => (
-                <TableRow
-                  hover
-                  key={user._id}
-                  selected={selectedUserIds.indexOf(user._id) !== -1}
-                >
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedUserIds.indexOf(user._id) !== -1}
-                      onChange={(event) => handleSelectOne(event, user._id)}
-                      value="true"
-                    />
-                  </TableCell>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.email}</TableCell>
+              {invoices.slice(0, limit).map((invoice) => (
+                <TableRow hover key={invoice._id}>
+                  <TableCell>{invoice.user_id}</TableCell>
                   <TableCell>
-                    {user.gender === 0
-                      ? 'Nam'
-                      : user.gender === 1
-                      ? 'Nữ'
-                      : 'Khác'}
+                    {moment.unix(invoice.created_date).format('DD/MM/yyyy')}
                   </TableCell>
-                  <TableCell>
-                    {moment.unix(user.date_of_birth).format('DD/MM/yyyy')}
-                  </TableCell>
+                  <TableCell>{invoice.total_money}</TableCell>
+                  <TableCell>{invoice.payment_id}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -124,7 +67,7 @@ const InvoiceResult = ({ users }) => {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={users.length}
+        count={invoices.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -136,7 +79,7 @@ const InvoiceResult = ({ users }) => {
 };
 
 InvoiceResult.propTypes = {
-  users: PropTypes.array.isRequired
+  invoices: PropTypes.array.isRequired
 };
 
 export default InvoiceResult;

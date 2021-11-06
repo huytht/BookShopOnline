@@ -6,18 +6,18 @@ import ReviewBookResult from '../components/reviewbook/ReviewBookResult';
 import ReviewBookToolbar from '../components/reviewbook/ReviewBookToolbar';
 
 const ReviewBookList = () => {
-  const [users, setUsers] = useState([]);
-  // Read all user
+  const [reviews, setReviews] = useState([]);
+  // Read all review
   useEffect(() => {
-    axios.get('http://localhost:8000/user/').then((res) => {
-      setUsers(res.data);
+    axios.get('http://localhost:8000/review/').then((res) => {
+      setReviews(res.data);
     });
-    const interval = setInterval(users, 1000);
+    const interval = setInterval(reviews, 1000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [users]);
+  }, [reviews]);
   return (
     <>
       <Helmet>
@@ -33,7 +33,7 @@ const ReviewBookList = () => {
         <Container maxWidth={false}>
           <ReviewBookToolbar />
           <Box sx={{ pt: 3 }}>
-            <ReviewBookResult users={users} />
+            <ReviewBookResult reviews={reviews} />
           </Box>
         </Container>
       </Box>

@@ -18,11 +18,15 @@ const PaymentForm = () => {
     name: ''
   };
 
-  const [categoryExist, setCategoryExist] = useState(false);
+  const [paymentExist, setPaymentExist] = useState(false);
 
   const validate = () => {
     const temp = {};
-    temp.name = categoryExist ? 'Name has exist.' : '';
+    temp.name = !values.name
+      ? 'This field is required.'
+      : paymentExist
+      ? 'Name has exist.'
+      : '';
 
     setErrors({
       ...temp
@@ -30,34 +34,34 @@ const PaymentForm = () => {
     return Object.values(temp).every((x) => x === '');
   };
 
-  const checkCategoryExist = () => {
+  const checkPaymentExist = () => {
     if (params.has('id')) {
       axios
         .get(
-          `http://localhost:8000/category/check-category/${
+          `http://localhost:8000/payment/check-payment/${
             values.name
           }/${params.get('id')}`
         )
-        .then((res) => setCategoryExist(res.data));
+        .then((res) => setPaymentExist(res.data));
     } else {
       axios
-        .get(`http://localhost:8000/category/check-category/${values.name}`)
-        .then((res) => setCategoryExist(res.data));
+        .get(`http://localhost:8000/payment/check-payment/${values.name}`)
+        .then((res) => setPaymentExist(res.data));
     }
   };
 
   const params = new URL(document.location).searchParams;
   if (params.has('id')) {
     useEffect(() => {
-      const fetchCategoryData = async () => {
+      const fetchPaymentData = async () => {
         const response = await fetch(
-          `http://localhost:8000/category/get-category/${params.get('id')}`
+          `http://localhost:8000/payment/get-payment/${params.get('id')}`
         );
-        const fetchedCategory = await response.json();
+        const fetchedPayment = await response.json();
 
-        setValues(fetchedCategory);
+        setValues(fetchedPayment);
       };
-      fetchCategoryData();
+      fetchPaymentData();
     }, []);
   }
 
@@ -70,9 +74,7 @@ const PaymentForm = () => {
       if (params.has('id')) {
         axios
           .put(
-            `http://localhost:8000/category/update-category/${params.get(
-              'id'
-            )}`,
+            `http://localhost:8000/payment/update-payment/${params.get('id')}`,
             {
               name: values.name
             }
@@ -81,7 +83,7 @@ const PaymentForm = () => {
         window.alert('Update successfully!!');
       } else {
         axios
-          .post('http://localhost:8000/category/create-category/', {
+          .post('http://localhost:8000/payment/create-payment/', {
             name: values.name
           })
           .then((res) => console.log(res));
@@ -104,19 +106,17 @@ const PaymentForm = () => {
           <Grid container spacing={3}>
             <Grid item md={12} xs={12}>
               <Controls.Input
-                helperText="Name Payment"
                 label="Name"
                 name="name"
                 error={errors.name}
                 onChange={handleInputChange}
-                required
                 InputLabelProps={{
                   shrink: true
                 }}
                 value={values.name}
                 variant="outlined"
                 onBlur={() => {
-                  checkCategoryExist();
+                  checkPaymentExist();
                 }}
               />
             </Grid>

@@ -6,18 +6,18 @@ import PaymentToolbar from '../components/payment/PaymentToolbar';
 import PaymentResult from '../components/payment/PaymentResult';
 
 const PaymentList = () => {
-  const [categories, setCategories] = useState([]);
-  // Read all category
+  const [payments, setPayments] = useState([]);
+  // Read all payment
   useEffect(() => {
-    axios.get('http://localhost:8000/category/').then((res) => {
-      setCategories(res.data);
+    axios.get('http://localhost:8000/payment/').then((res) => {
+      setPayments(res.data);
     });
-    const interval = setInterval(categories, 1000);
+    const interval = setInterval(payments, 1000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [categories]);
+  }, [payments]);
   return (
     <>
       <Helmet>
@@ -33,7 +33,7 @@ const PaymentList = () => {
         <Container maxWidth={false}>
           <PaymentToolbar />
           <Box sx={{ pt: 3 }}>
-            <PaymentResult categories={categories} />
+            <PaymentResult payments={payments} />
           </Box>
         </Container>
       </Box>
