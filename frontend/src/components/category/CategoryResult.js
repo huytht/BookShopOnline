@@ -20,7 +20,6 @@ import {
 import axios from 'axios';
 
 const CategoryResult = ({ categories }) => {
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
@@ -28,45 +27,6 @@ const CategoryResult = ({ categories }) => {
     axios
       .delete(`http://localhost:8000/category/delete-category/${id}`)
       .then((res) => console.log(res));
-  };
-
-  const handleSelectAll = (event) => {
-    let newSelectedCategoryIds;
-
-    if (event.target.checked) {
-      newSelectedCategoryIds = categories.map((category) => category.id);
-    } else {
-      newSelectedCategoryIds = [];
-    }
-
-    setSelectedCategoryIds(newSelectedCategoryIds);
-  };
-
-  const handleSelectOne = (event, id) => {
-    const selectedIndex = selectedCategoryIds.indexOf(id);
-    let newSelectedCategoryIds = [];
-
-    if (selectedIndex === -1) {
-      newSelectedCategoryIds = newSelectedCategoryIds.concat(
-        selectedCategoryIds,
-        id
-      );
-    } else if (selectedIndex === 0) {
-      newSelectedCategoryIds = newSelectedCategoryIds.concat(
-        selectedCategoryIds.slice(1)
-      );
-    } else if (selectedIndex === selectedCategoryIds.length - 1) {
-      newSelectedCategoryIds = newSelectedCategoryIds.concat(
-        selectedCategoryIds.slice(0, -1)
-      );
-    } else if (selectedIndex > 0) {
-      newSelectedCategoryIds = newSelectedCategoryIds.concat(
-        selectedCategoryIds.slice(0, selectedIndex),
-        selectedCategoryIds.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelectedCategoryIds(newSelectedCategoryIds);
   };
 
   const handleLimitChange = (event) => {
@@ -84,17 +44,6 @@ const CategoryResult = ({ categories }) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedCategoryIds.length === categories.length}
-                    color="primary"
-                    indeterminate={
-                      selectedCategoryIds.length > 0 &&
-                      selectedCategoryIds.length < categories.length
-                    }
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
                 <TableCell style={{ textAlign: 'center' }}>Name</TableCell>
                 <TableCell colSpan={2} style={{ textAlign: 'center' }}>
                   Action
@@ -106,15 +55,7 @@ const CategoryResult = ({ categories }) => {
                 <TableRow
                   hover
                   key={category._id}
-                  selected={selectedCategoryIds.indexOf(category._id) !== -1}
                 >
-                  <TableCell padding="checkbox" style={{ textAlign: 'center' }}>
-                    <Checkbox
-                      checked={selectedCategoryIds.indexOf(category._id) !== -1}
-                      onChange={(event) => handleSelectOne(event, category._id)}
-                      value="true"
-                    />
-                  </TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
                     {category.name}
                   </TableCell>

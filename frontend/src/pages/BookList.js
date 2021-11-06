@@ -6,22 +6,18 @@ import BookListToolbar from '../components/book/BookListToolbar';
 import BookListResult from '../components/book/BookListResult';
 
 const BookList = () => {
-  const [users, setUsers] = useState([]);
-  // Read all user
+  const [books, setBooks] = useState([]);
+  // Read all book
   useEffect(() => {
-    axios.get('http://localhost:8000/user/').then((res) => {
-      setUsers(res.data);
-    });
-    const interval = setInterval(users, 1000);
+    axios.get('http://localhost:8000/book/').then((res) => setBooks(res.data));
+    const interval = setInterval(books, 1000);
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, [users]);
+    clearInterval(interval);
+  }, [books]);
   return (
     <>
       <Helmet>
-        <title>Users | Material Kit</title>
+        <title>Books | Material Kit</title>
       </Helmet>
       <Box
         sx={{
@@ -33,7 +29,7 @@ const BookList = () => {
         <Container maxWidth={false}>
           <BookListToolbar />
           <Box sx={{ pt: 3 }}>
-            <BookListResult users={users} />
+            <BookListResult books={books} />
           </Box>
         </Container>
       </Box>

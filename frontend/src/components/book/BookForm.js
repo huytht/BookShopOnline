@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Button,
@@ -6,117 +6,213 @@ import {
   CardContent,
   CardHeader,
   Divider,
-  Grid
+  Grid,
+  Checkbox,
+  InputLabel,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  FormHelperText
 } from '@material-ui/core';
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 import axios from 'axios';
 import moment from 'moment';
 import Controls from '../controls/Controls';
 import { useForm, Form } from '../useForm';
+import { storage } from '../../firebase';
 
-const AuthLevel = [
-  {
-    value: 'customer',
-    label: 'Customer'
-  },
-  {
-    value: 'admin',
-    label: 'Admin'
-  }
-];
-
-const gender = [
-  {
-    value: 1,
-    label: 'Nữ'
-  },
-  {
-    value: 0,
-    label: 'Nam'
-  },
-  {
-    value: 2,
-    label: 'Khác'
-  }
-];
+const initValues = {
+  isbn: '',
+  title: '',
+  summary_content: '',
+  author: '',
+  published_date: '',
+  price: 0,
+  image: '',
+  category_id: [],
+  isSold: false
+};
 
 const BookForm = () => {
-  const initValues = {
-    username: '',
-    password: '',
-    date_of_birth: '',
-    registration_date: '',
-    email: '',
-    gender: 0,
-    authLevel: 'customer'
-  };
-  const [userExist, setUserExist] = useState(false);
+  const [bookExist, setBookExist] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [image, setImage] = useState(null);
+  const [defaultVal, setDefaultVal] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const animatedComponents = makeAnimated();
 
-  const validate = () => {
+  const validate = (fieldValues = values) => {
     const temp = {};
-    temp.username = userExist ? 'Username has exist.' : '';
+    temp.isbn = !fieldValues.isbn
+      ? 'This field is required.'
+      : bookExist
+      ? 'ISBN has exist.'
+      : '';
+    temp.title = fieldValues.title ? '' : 'This field is required.';
+    temp.summary_content = fieldValues.summary_content
+      ? ''
+      : 'This field is required.';
+    temp.author = fieldValues.author ? '' : 'This field is required.';
+    temp.published_date = fieldValues.published_date
+      ? ''
+      : 'This field is required.';
+    temp.category_id =
+      selectedCategories.length !== 0 ? '' : 'This field is required.';
+
+    temp.price = !/^\d+$/.test(fieldValues.price)
+      ? 'Price must be number.'
+      : fieldValues.price <= 0
+      ? 'Price must be greater than 0.'
+      : '';
+
     setErrors({
       ...temp
     });
+    if (fieldValues === values) {
+      return Object.values(temp).every((x) => x === '');
+    }
+  };
+  const { values, setValues, errors, setErrors, handleInputChange, resetForm } =
+    useForm(initValues, true, validate);
 
-    return Object.values(temp).every((x) => x === '');
+  // Read all category
+  useEffect(() => {
+    axios.get('http://localhost:8000/category/').then((res) => {
+      setCategories(res.data);
+    });
+  }, []);
+
+  // HandleChange for dropdown multiselect
+  const handleChange = (e) => {
+    setSelectedCategories(e);
   };
 
-  const checkUserExist = () => {
+  // HandleChange for choose file
+  const handleFileChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
+  const Category = () => {
+    return categories.map((category) => ({
+      label: category.name,
+      value: category._id
+    }));
+  };
+
+  const checkBookExist = () => {
     axios
-      .get(`http://localhost:8000/user/check-user/${values.username}`)
-      .then((res) => setUserExist(res.data));
+      .get(`http://localhost:8000/book/check-book/${values.isbn}`)
+      .then((res) => setBookExist(res.data));
   };
 
   const params = new URL(document.location).searchParams;
   if (params.has('id')) {
     useEffect(() => {
-      const fetchUserData = async () => {
+      const fetchBookData = async () => {
         const response = await fetch(
-          `http://localhost:8000/user/get-user/${params.get('id')}`
+          `http://localhost:8000/book/get-book/${params.get('id')}`
         );
-        const fetchedUser = await response.json();
-        fetchedUser.date_of_birth = moment
-          .unix(fetchedUser.date_of_birth)
+        const fetchedBook = await response.json();
+        fetchedBook.published_date = moment
+          .unix(fetchedBook.published_date)
           .format('yyyy-MM-DD');
-        setValues(fetchedUser);
+        setValues(fetchedBook);
       };
-      fetchUserData();
+      fetchBookData();
     }, []);
   }
 
-  const { values, setValues, errors, setErrors, handleInputChange, resetForm } =
-    useForm(initValues, true, validate);
+  const getDefaultCategory = () => {
+    if (defaultVal !== []) {
+      return defaultVal.map((category) => ({
+        label: category.name,
+        value: category._id
+      }));
+    }
+  };
+
+  useEffect(() => {
+    setDefaultVal([]);
+    setLoading(true);
+  }, [loading]);
+
+  useEffect(() => {
+    if (defaultVal.length > 0) {
+      console.log(getDefaultCategory());
+      setSelectedCategories(getDefaultCategory());
+    } else if (params.has('id') && !defaultVal.length) {
+      axios
+        .post('http://localhost:8000/category/get-list-category/', {
+          idList: values.category_id
+        })
+        .then((res) => {
+          setDefaultVal(res.data);
+        })
+        .catch((error) => {
+          console.log(error.response);
+        });
+      console.log(defaultVal);
+    }
+  }, [defaultVal]);
 
   const submitFormHandler = (event) => {
     event.preventDefault();
+    console.log(errors.category_id);
     if (validate()) {
-      const dob = Math.floor(new Date(values.date_of_birth).getTime() / 1000);
+      const pd = Math.floor(new Date(values.published_date).getTime() / 1000);
       if (params.has('id')) {
         axios
-          .put(`http://localhost:8000/user/update-user/${params.get('id')}`, {
-            username: values.username,
-            password: values.password,
-            date_of_birth: dob,
-            email: values.email,
-            gender: parseInt(values.gender, 10),
-            authLevel: values.authLevel
+          .put(`http://localhost:8000/book/update-book/${params.get('id')}`, {
+            isbn: values.isbn,
+            title: values.title,
+            summary_content: values.summary_cotent,
+            author: values.author,
+            published_date: pd,
+            price: parseInt(values.price, 10),
+            image: image.name,
+            category_id: selectedCategories.map((item) => item.value),
+            isSold: values.isSold
           })
           .then((res) => console.log(res));
       } else {
         const currentDate = Math.floor(new Date().getTime() / 1000);
+        const uploadBook = storage.ref(`book/${image.name}`).put(image);
         axios
-          .post('http://localhost:8000/user/create-user/', {
-            username: values.username,
-            password: values.password,
-            date_of_birth: dob,
-            registration_date: currentDate,
-            email: values.email,
-            gender: parseInt(values.gender, 10),
-            authLevel: values.authLevel
+          .post('http://localhost:8000/book/create-book/', {
+            isbn: values.isbn,
+            title: values.title,
+            summary_content: values.summary_content,
+            author: values.author,
+            published_date: pd,
+            price: parseInt(values.price, 10),
+            image: image.name,
+            category_id: selectedCategories.map((item) => item.value),
+            isSold: values.isSold
           })
           .then((res) => console.log(res));
+        // Upload image book
+        uploadBook.on(
+          'state_changed',
+          (snapshot) => {},
+          (error) => {
+            console.log(error);
+          },
+          () => {
+            storage
+              .ref('book')
+              .child(image.name)
+              .getDownloadURL()
+              .then((urlImage) => {
+                console.log(urlImage);
+              });
+          }
+        );
       }
-      resetForm();
+      // resetForm();
     }
   };
 
@@ -129,149 +225,153 @@ const BookForm = () => {
           <Grid container spacing={3}>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
-                helperText="ISBN"
                 label="ISBN"
-                name="username"
+                name="isbn"
                 onChange={handleInputChange}
-                required
-                error={errors.username}
+                error={errors.isbn}
                 InputLabelProps={{
                   shrink: true
                 }}
-                inputProps={params.has('id') ? { readOnly: true } : ''}
-                value={values.username}
+                value={values.isbn}
                 variant="outlined"
                 onBlur={() => {
-                  checkUserExist();
+                  checkBookExist();
                 }}
               />
-              {errors.length > 0 ? (
-                <div className="has-error">{errors.join(', ')}</div>
-              ) : null}
             </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
-                helperText="Title"
                 label="Title"
-                name="password"
+                name="title"
                 type="text"
-                error={errors.password}
+                error={errors.title}
                 InputLabelProps={{
                   shrink: true
                 }}
                 onChange={handleInputChange}
-                required
-                value={values.password}
+                value={values.title}
                 variant="outlined"
               />
             </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
-                required
-                helperText="Sumary_Content"
-                label="Sumary_Content"
-                name="date_of_birth"
+                label="Summary Content"
+                name="summary_content"
                 type="text"
+                rowsmax={3}
+                rows={2}
+                multiline
                 onChange={handleInputChange}
-                value={values.date_of_birth}
+                value={values.summary_content}
                 InputLabelProps={{
                   shrink: true
                 }}
+                error={errors.summary_content}
                 variant="outlined"
               />
             </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
                 label="Author"
-                helperText="Author"
-                name="email"
+                name="author"
                 type="text"
-                error={errors.email}
+                error={errors.author}
                 InputLabelProps={{
                   shrink: true
                 }}
                 onChange={handleInputChange}
-                required
-                value={values.email}
+                value={values.author}
                 variant="outlined"
               />
             </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
-                label="Pulished_date"
-                name="gender"
+                label="Published Date"
+                name="published_date"
                 onChange={handleInputChange}
                 type="date"
                 InputLabelProps={{
-                    shrink: true
-                  }}
+                  shrink: true
+                }}
+                error={errors.published_date}
                 SelectProps={{ native: true }}
-                value={values.gender}
+                value={values.published_date}
                 variant="outlined"
-              >
-                {gender.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Controls.Input>
+              />
             </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
                 label="Price"
-                name="password"
+                name="price"
                 type="numeric"
-                error={errors.password}
+                error={errors.price}
                 InputLabelProps={{
                   shrink: true
                 }}
                 onChange={handleInputChange}
-                required
-                value={values.password}
+                value={values.price}
                 variant="outlined"
               />
             </Grid>
+            {params.has('id') ? (
+              <Grid item md={6} xs={12}>
+                <p>&nbsp;Image (current)</p>
+                <img
+                  width="100px"
+                  height="100px"
+                  src={`https://firebasestorage.googleapis.com/v0/b/bookshoponline-85349.appspot.com/o/book%2F${values.image}?alt=media`}
+                  alt=""
+                />
+              </Grid>
+            ) : (
+              ''
+            )}
+            <Grid item md={6} xs={12}>
+              <p>&nbsp;Category</p>
+              <Select
+                className="dropdown"
+                placeholder="Choose category"
+                value={selectedCategories}
+                options={Category()}
+                components={animatedComponents}
+                onChange={handleChange}
+                isMulti
+                isClearable
+              />
+              <FormHelperText style={{ color: '#d32f2f' }}>
+                &nbsp;&nbsp;&nbsp;
+                {errors.category_id ? errors.category_id : ''}
+              </FormHelperText>
+            </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
                 label="Image"
-                name="password"
+                name="image"
                 type="file"
-                error={errors.password}
                 InputLabelProps={{
                   shrink: true
                 }}
-                onChange={handleInputChange}
-                required
-                value={values.password}
+                onChange={handleFileChange}
                 variant="outlined"
               />
             </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                fullWidth
-                label="Category_Id"
-                name="authLevel"
-                onChange={handleInputChange}
+                label="Is Sold"
+                name="isSold"
                 select
                 InputLabelProps={{
                   shrink: true
                 }}
-                SelectProps={{ native: true }}
-                value={values.authLevel}
+                onChange={handleInputChange}
+                SelectProps={{
+                  native: true
+                }}
+                value={values.isSold}
                 variant="outlined"
               >
-                {AuthLevel.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
+                <option value="true">True</option>
+                <option value="false">False</option>
               </Controls.Input>
             </Grid>
           </Grid>

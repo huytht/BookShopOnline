@@ -19,49 +19,14 @@ import {
 } from '@material-ui/core';
 import axios from 'axios';
 
-const BookListResult = ({ users }) => {
-  const [selectedUserIds, setSelectedUserIds] = useState([]);
+const BookListResult = ({ books }) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
-  const deleteUserHandler = (id) => {
+  const deleteBookHandler = (id) => {
     axios
-      .delete(`http://localhost:8000/user/delete-user/${id}`)
+      .delete(`http://localhost:8000/book/delete-book/${id}`)
       .then((res) => console.log(res));
-  };
-
-  const handleSelectAll = (event) => {
-    let newSelectedUserIds;
-
-    if (event.target.checked) {
-      newSelectedUserIds = users.map((user) => user.id);
-    } else {
-      newSelectedUserIds = [];
-    }
-
-    setSelectedUserIds(newSelectedUserIds);
-  };
-
-  const handleSelectOne = (event, id) => {
-    const selectedIndex = selectedUserIds.indexOf(id);
-    let newSelectedUserIds = [];
-
-    if (selectedIndex === -1) {
-      newSelectedUserIds = newSelectedUserIds.concat(selectedUserIds, id);
-    } else if (selectedIndex === 0) {
-      newSelectedUserIds = newSelectedUserIds.concat(selectedUserIds.slice(1));
-    } else if (selectedIndex === selectedUserIds.length - 1) {
-      newSelectedUserIds = newSelectedUserIds.concat(
-        selectedUserIds.slice(0, -1)
-      );
-    } else if (selectedIndex > 0) {
-      newSelectedUserIds = newSelectedUserIds.concat(
-        selectedUserIds.slice(0, selectedIndex),
-        selectedUserIds.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelectedUserIds(newSelectedUserIds);
   };
 
   const handleLimitChange = (event) => {
@@ -79,79 +44,61 @@ const BookListResult = ({ users }) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedUserIds.length === users.length}
-                    color="primary"
-                    indeterminate={
-                      selectedUserIds.length > 0 &&
-                      selectedUserIds.length < users.length
-                    }
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
                 <TableCell>ISBN</TableCell>
                 <TableCell>Title</TableCell>
-                <TableCell>Sumary_Content</TableCell>
                 <TableCell>Author</TableCell>
 
-                <TableCell>Pulished_date</TableCell>
+                <TableCell>Published Date</TableCell>
                 <TableCell>Price</TableCell>
                 <TableCell>Image</TableCell>
-                <TableCell>Category_Id</TableCell>
+                <TableCell>Category</TableCell>
+                <TableCell>Sold</TableCell>
                 <TableCell colSpan={2} style={{ textAlign: 'center' }}>
                   Action
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.slice(0, limit).map((user) => (
-                <TableRow
-                  hover
-                  key={user._id}
-                  selected={selectedUserIds.indexOf(user._id) !== -1}
-                >
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedUserIds.indexOf(user._id) !== -1}
-                      onChange={(event) => handleSelectOne(event, user._id)}
-                      value="true"
+              {books.slice(0, limit).map((book) => (
+                <TableRow hover key={book._id}>
+                  <TableCell>{book.isbn}</TableCell>
+                  <TableCell>{book.title}</TableCell>
+                  <TableCell>{book.author}</TableCell>
+                  <TableCell>
+                    {moment.unix(book.published_date).format('DD/MM/yyyy')}
+                  </TableCell>
+                  <TableCell>{book.price}</TableCell>
+                  <TableCell>
+                    <img
+                      width="100px"
+                      height="100px"
+                      src={`https://firebasestorage.googleapis.com/v0/b/bookshoponline-85349.appspot.com/o/book%2F${book.image}?alt=media`}
+                      alt=""
                     />
                   </TableCell>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    {user.gender === 0
-                      ? 'Nam'
-                      : user.gender === 1
-                      ? 'Nữ'
-                      : 'Khác'}
+                    {book.category_id.map((category, idx) =>
+                      idx === book.category_id.length - 1
+                        ? category.concat('')
+                        : category.concat(' - ')
+                    )}
                   </TableCell>
-                  <TableCell>
-                    {moment.unix(user.date_of_birth).format('DD/MM/yyyy')}
-                  </TableCell>
-                  <TableCell>
-                    {moment.unix(user.registration_date).format('DD/MM/yyyy')}
-                  </TableCell>
-                  <TableCell>{user.authLevel}</TableCell>
-                  <TableCell>{user.authLevel}</TableCell>
-                  <TableCell>{user.authLevel}</TableCell>
+                  <TableCell>{book.isSold ? 'TRUE' : 'FALSE'}</TableCell>
                   <TableCell>
                     <IconButton
                       component={RouterLink}
-                      to={`/app/user-form?id=${user._id}`}
+                      to={`/app/book-form?id=${book._id}`}
                     >
                       <EditIcon />
                     </IconButton>
                   </TableCell>
                   <TableCell>
-                    {/* onClick={deleteUserHandler(user._id)} */}
-                    <IconButton>
-                      <DeleteIcon
-                        onClick={() => {
-                          deleteUserHandler(user._id);
-                        }}
-                      />
+                    <IconButton
+                      onClick={() => {
+                        deleteBookHandler(book._id);
+                      }}
+                    >
+                      <DeleteIcon />
                     </IconButton>
                   </TableCell>
                 </TableRow>
@@ -162,7 +109,7 @@ const BookListResult = ({ users }) => {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={users.length}
+        count={books.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -174,7 +121,7 @@ const BookListResult = ({ users }) => {
 };
 
 BookListResult.propTypes = {
-  users: PropTypes.array.isRequired
+  books: PropTypes.array.isRequired
 };
 
 export default BookListResult;

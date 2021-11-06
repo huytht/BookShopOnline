@@ -30,7 +30,7 @@ const BookListToolbar = (props) => (
         component={RouterLink}
         to="/app/book-form"
       >
-        Add product
+        Add New Book
       </Button>
     </Box>
     <Box sx={{ mt: 3 }}>

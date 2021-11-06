@@ -22,7 +22,7 @@ const CategoryForm = () => {
 
   const validate = () => {
     const temp = {};
-    temp.name = categoryExist ? 'Name has exist.' : '';
+    temp.name = !values.name ? 'This field is required.' : categoryExist ? 'Name has exist.' : '';
 
     setErrors({
       ...temp
@@ -109,7 +109,6 @@ const CategoryForm = () => {
                 name="name"
                 error={errors.name}
                 onChange={handleInputChange}
-                required
                 InputLabelProps={{
                   shrink: true
                 }}
