@@ -21,7 +21,7 @@ const ReviewBookList = () => {
   return (
     <>
       <Helmet>
-        <title>Invoice Details | Material Kit</title>
+        <title>Order Details | Material Kit</title>
       </Helmet>
       <Box
         sx={{

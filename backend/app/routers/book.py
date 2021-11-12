@@ -7,7 +7,19 @@ from ..routers.category import list_category
 
 router = APIRouter()
 
-TIME_FORMAT='%Y-%m-%dT%H:%M:%S'
+TIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
+
+
+async def getNextSequence(name: str, request: Request):
+    ret = await request.app.mongodb["book"].find_one_and_update(
+        filter={"_id": name},
+        upsert=True,
+        update={"$inc": {"seq": 1}},
+        return_document=True
+    )
+
+    return f"{ret['seq']}"
+
 
 @router.get("/", response_description="List all book")
 async def list_books(request: Request):
@@ -15,27 +27,33 @@ async def list_books(request: Request):
 
     for book in await request.app.mongodb["book"].find().to_list(length=100):
         category_name = []
-        for category_id in book['category_id']:
-            for cate in await list_category(request):
-                if cate['_id'] == category_id:
-                    category_name.append(cate['name'])
-                    break
-        book['category_id'] = category_name
-        books.append(book)
+        if isinstance(book["_id"], int):
+            for category_id in book['category_id']:
+                for cate in await list_category(request):
+                    if cate['_id'] == category_id:
+                        category_name.append(cate['name'])
+                        break
+        
+            book['category_id'] = category_name
+            books.append(book)
 
     return books
 
+
 @router.get("/get-book/{id}", response_description="Get book detail")
-async def get_book(id: str, request: Request):
+async def get_book(id: int, request: Request):
     if (book := await request.app.mongodb["book"].find_one({"_id": id})) is not None:
         return book
-    
+
     raise HTTPException(status_code=404, detail="Book {id} not found")
+
 
 @router.post("/create-book/")
 async def create_book(request: Request, book: BookModel = Body(...)):
     book = jsonable_encoder(book)
-    book['published_date'] = datetime.strptime(book['published_date'], TIME_FORMAT + "+00:00").timestamp()
+    book['published_date'] = datetime.strptime(
+        book['published_date'], TIME_FORMAT + "+00:00").timestamp()
+    book['_id'] = int(await getNextSequence("bookid", request))
     new_book = await request.app.mongodb["book"].insert_one(book)
     created_book = await request.app.mongodb["book"].find_one(
         {"_id": new_book.inserted_id}
@@ -43,12 +61,13 @@ async def create_book(request: Request, book: BookModel = Body(...)):
 
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_book)
 
+
 @router.put("/update-book/{id}")
-async def update_book(id: str, request: Request, book: BookUpdateModel = Body(...)):
+async def update_book(id: int, request: Request, book: BookUpdateModel = Body(...)):
     book = {k: v for k, v in book.dict().items() if v is not None}
 
     if (len(book) >= 1):
-        book['published_date'] = book['published_date'].timestamp()        
+        book['published_date'] = book['published_date'].timestamp()
         update_book_result = await request.app.mongodb["book"].update_one(
             {"_id": id},
             {"$set": book}
@@ -61,20 +80,22 @@ async def update_book(id: str, request: Request, book: BookUpdateModel = Body(..
                 return update_book
 
     if (existing_book := await request.app.mongodb["book"].find_one(
-            {"_id": id}
-        )) is not None:
+        {"_id": id}
+    )) is not None:
         return existing_book
-    
+
     raise HTTPException(status_code=404, detail=f"book {id} not found")
 
+
 @router.delete("/delete-book/{id}")
-async def delete_book(id: str, request: Request):
+async def delete_book(id: int, request: Request):
     delete_book = await request.app.mongodb["book"].delete_one({"_id": id})
 
     if delete_book.deleted_count == 1:
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail=f"book {id} not found")
+
 
 @router.get('/check-book/{isbn}')
 async def check_book(isbn: str, request: Request):
@@ -84,8 +105,9 @@ async def check_book(isbn: str, request: Request):
 
     return False
 
+
 @router.get('/check-book/{isbn}/{id}')
-async def check_book(isbn: str, id: str, request: Request):
+async def check_book(isbn: str, id: int, request: Request):
     for book in await list_books(request):
         if book['isbn'] == isbn & book['_id'] != id:
             return True

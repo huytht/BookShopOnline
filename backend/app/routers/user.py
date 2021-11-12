@@ -3,22 +3,34 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from datetime import datetime
 from ..models.user import UserModel, UserUpdateModel
-from typing import Optional
+from .authenticate import get_password_hash
+import time
 
 router = APIRouter()
 
 TIME_FORMAT='%Y-%m-%dT%H:%M:%S'
 
+async def getNextSequence(name: str, request: Request):
+    ret = await request.app.mongodb["user"].find_one_and_update(
+        filter={"_id": name},
+        upsert=True, 
+        update={"$inc": {"seq": 1}},
+        return_document=True
+    )
+
+    return f"{ret['seq']}"
+
 @router.get("/", response_description="List all user")
 async def list_users(request: Request):
     users = []
     for doc in await request.app.mongodb["user"].find().to_list(length=100):
-        users.append(doc)
+        if isinstance(doc['_id'], int):
+            users.append(doc)
 
     return users
 
 @router.get("/get-user/{id}", response_description="Get user detail")
-async def get_user(id: str, request: Request):
+async def get_user(id: int, request: Request):
     if (user := await request.app.mongodb["user"].find_one({"_id": id})) is not None:
         return user
     
@@ -27,8 +39,10 @@ async def get_user(id: str, request: Request):
 @router.post("/create-user/")
 async def create_user(request: Request, user: UserModel = Body(...)):
     user = jsonable_encoder(user)
+    user['password'] = get_password_hash(user['password'])
     user['date_of_birth'] = datetime.strptime(user['date_of_birth'], TIME_FORMAT + "+00:00").timestamp()
-    user['registration_date'] = datetime.strptime(user['registration_date'], TIME_FORMAT + "+00:00").timestamp()
+    user['_id'] = int(await getNextSequence("userid", request))
+    user['registration_date'] = int(time.time())
     new_user = await request.app.mongodb["user"].insert_one(user)
     created_user = await request.app.mongodb["user"].find_one(
         {"_id": new_user.inserted_id}
@@ -37,11 +51,15 @@ async def create_user(request: Request, user: UserModel = Body(...)):
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_user)
 
 @router.put("/update-user/{id}")
-async def update_user(id: str, request: Request, user: UserUpdateModel = Body(...)):
+async def update_user(id: int, request: Request, user: UserUpdateModel = Body(...)):
     user = {k: v for k, v in user.dict().items() if v is not None}
 
     if (len(user) >= 1):
-        user['date_of_birth'] = user['date_of_birth'].timestamp()        
+        if user['password'] is not None:
+            user['password'] = get_password_hash(user['password'])
+        # print(user['date_of_birth'])
+        # if user['date_of_birth'] is not None:
+        #    user['date_of_birth'] = user['date_of_birth'].timestamp()        
         update_user_result = await request.app.mongodb["user"].update_one(
             {"_id": id},
             {"$set": user}
@@ -61,7 +79,7 @@ async def update_user(id: str, request: Request, user: UserUpdateModel = Body(..
     raise HTTPException(status_code=404, detail=f"user {id} not found")
 
 @router.delete("/delete-user/{id}")
-async def delete_user(id: str, request: Request):
+async def delete_user(id: int, request: Request):
     delete_user = await request.app.mongodb["user"].delete_one({"_id": id})
 
     if delete_user.deleted_count == 1:
@@ -78,7 +96,7 @@ async def check_user(username: str, request: Request):
     return False
 
 @router.get("/check-user/{username}/{id}")
-async def check_user(username: str, id: str, request: Request):
+async def check_user(username: str, id: int, request: Request):
 
     for user in await list_users(request):
         if user['username'] == username & user['_id'] != id:

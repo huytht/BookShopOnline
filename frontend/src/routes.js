@@ -15,8 +15,8 @@ import BookList from './pages/BookList';
 import BookForm from './components/book/BookForm';
 import PaymentList from './pages/PaymentList';
 import PaymentForm from './components/payment/PaymentForm';
-import InvoiceList from './pages/InvoiceList';
-import InvoiceDetailsList from './pages/InvoiceDetailsList';
+import OrderList from './pages/OrderList';
+import OrderDetailsList from './pages/OrderDetailsList';
 import ReviewBookList from './pages/ReviewBookList';
 import TotalRevenueList from './pages/TotalRevenueList';
 
@@ -35,8 +35,8 @@ const routes = [
       { path: 'book-form', element: <BookForm /> },
       { path: 'payment', element: <PaymentList /> },
       { path: 'payment-form', element: <PaymentForm /> },
-      { path: 'invoice', element: <InvoiceList /> },
-      { path: 'invoicedetails', element: <InvoiceDetailsList /> },
+      { path: 'order', element: <OrderList /> },
+      { path: 'orderdetails', element: <OrderDetailsList /> },
       { path: 'reviewbook', element: <ReviewBookList /> },
       { path: 'totalrevenue', element: <TotalRevenueList /> },
       { path: 'settings', element: <Settings /> },

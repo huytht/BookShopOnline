@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core';
 import { Search as SearchIcon } from 'react-feather';
 
-const InvoiceDetailsToolbar = (props) => (
+const OrderToolbar = (props) => (
   <Box {...props}>
     <Box
       sx={{
@@ -46,4 +46,4 @@ const InvoiceDetailsToolbar = (props) => (
   </Box>
 );
 
-export default InvoiceDetailsToolbar;
+export default OrderToolbar;

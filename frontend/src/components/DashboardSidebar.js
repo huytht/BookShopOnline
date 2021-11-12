@@ -62,14 +62,14 @@ const items = [
     title: 'Payment'
   },
   {
-    href: '/app/invoice',
+    href: '/app/order',
     icon: FileTextIcon,
-    title: 'Invoice'
+    title: 'Order'
   },
   {
-    href: '/app/invoicedetails',
+    href: '/app/orderdetails',
     icon: FileMinusIcon,
-    title: 'Invoice Details'
+    title: 'Order Details'
   },
   {
     href: '/app/reviewbook',

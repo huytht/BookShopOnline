@@ -44,6 +44,7 @@ const UserListResults = ({ users }) => {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell>Full Name</TableCell>
                 <TableCell>Username</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Gender</TableCell>
@@ -58,10 +59,8 @@ const UserListResults = ({ users }) => {
             </TableHead>
             <TableBody>
               {users.slice(0, limit).map((user) => (
-                <TableRow
-                  hover
-                  key={user._id}
-                >
+                <TableRow hover key={user._id}>
+                  <TableCell>{user.fullname}</TableCell>
                   <TableCell>{user.username}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
@@ -87,12 +86,12 @@ const UserListResults = ({ users }) => {
                     </IconButton>
                   </TableCell>
                   <TableCell>
-                    <IconButton>
-                      <DeleteIcon
-                        onClick={() => {
-                          deleteUserHandler(user._id);
-                        }}
-                      />
+                    <IconButton
+                      onClick={() => {
+                        deleteUserHandler(user._id);
+                      }}
+                    >
+                      <DeleteIcon />
                     </IconButton>
                   </TableCell>
                 </TableRow>

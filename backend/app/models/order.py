@@ -1,11 +1,10 @@
 from typing import Optional
-import uuid
 from pydantic import BaseModel, Field
 from datetime import datetime
 
-class InvoiceModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
-    user_id: str = Field(...)
+class OrderModel(BaseModel):
+    id: Optional[int] = Field(alias="_id")
+    user_id: int = Field(...)
     created_date: Optional[datetime]
     total_money: int = Field(...)
     payment_id: int = Field(...)
@@ -15,14 +14,14 @@ class InvoiceModel(BaseModel):
         arbitrary_types_allowed = True
         schema_extra = {
             "example": {
-                "user_id": "36355438-8af5-4fa7-8e4c-2372517df0b6",
+                "user_id": 1,
                 "total_money": 20000,
                 "payment_id": 1
             }
         } 
 
-class InvoiceUpdateModel(BaseModel):
-    user_id: Optional[str]
+class OrderUpdateModel(BaseModel):
+    user_id: Optional[int]
     total_money: Optional[int]
     payment_id: Optional[int]
 
@@ -30,7 +29,7 @@ class InvoiceUpdateModel(BaseModel):
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
-                "user_id": "36355438-8af5-4fa7-8e4c-2372517df0b6",
+                "user_id": 1,
                 "total_money": 20000,
                 "payment_id": 1
             }

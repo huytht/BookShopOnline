@@ -12,7 +12,9 @@ const BookList = () => {
     axios.get('http://localhost:8000/book/').then((res) => setBooks(res.data));
     const interval = setInterval(books, 1000);
 
-    clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [books]);
   return (
     <>

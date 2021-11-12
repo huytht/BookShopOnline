@@ -2,26 +2,26 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
-import InvoiceResult from '../components/invoice/InvoiceResult';
-import InvoiceToolbar from '../components/invoice/InvoiceToolbar';
+import OrderResult from '../components/order/OrderResult';
+import OrderToolbar from '../components/order/OrderToolbar';
 
-const InvoiceList = () => {
-  const [invoices, setInvoices] = useState([]);
-  // Read all invoice
+const OrderList = () => {
+  const [orders, setOrders] = useState([]);
+  // Read all order
   useEffect(() => {
-    axios.get('http://localhost:8000/invoice/').then((res) => {
-      setInvoices(res.data);
+    axios.get('http://localhost:8000/order/').then((res) => {
+      setOrders(res.data);
     });
-    const interval = setInterval(invoices, 1000);
+    const interval = setInterval(orders, 1000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [invoices]);
+  }, [orders]);
   return (
     <>
       <Helmet>
-        <title>Invoice | Material Kit</title>
+        <title>Order | Material Kit</title>
       </Helmet>
       <Box
         sx={{
@@ -31,9 +31,9 @@ const InvoiceList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <InvoiceToolbar />
+          <OrderToolbar />
           <Box sx={{ pt: 3 }}>
-            <InvoiceResult invoices={invoices} />
+            <OrderResult orders={orders} />
           </Box>
         </Container>
       </Box>
@@ -41,4 +41,4 @@ const InvoiceList = () => {
   );
 };
 
-export default InvoiceList;
+export default OrderList;

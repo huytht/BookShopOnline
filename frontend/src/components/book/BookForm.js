@@ -179,7 +179,6 @@ const BookForm = () => {
           })
           .then((res) => console.log(res));
       } else {
-        const currentDate = Math.floor(new Date().getTime() / 1000);
         const uploadBook = storage.ref(`book/${image.name}`).put(image);
         axios
           .post('http://localhost:8000/book/create-book/', {

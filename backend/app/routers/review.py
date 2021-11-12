@@ -6,20 +6,31 @@ import time
 
 router = APIRouter()
 
+async def getNextSequence(name: str, request: Request):
+    ret = await request.app.mongodb["review"].find_one_and_update(
+        filter={"_id": name},
+        upsert=True, 
+        update={"$inc": {"seq": 1}},
+        return_document=True
+    )
+
+    return f"{ret['seq']}"
+
 @router.get("/", response_description="List all review")
 async def list_reviews(request: Request):
     reviews = []
     for review in await request.app.mongodb["review"].find().to_list(length=100):
-        if (user := await request.app.mongodb["user"].find_one({"_id": review['user_id']})) is not None:
-            review['user_username'] = user['username']
-        if (book := await request.app.mongodb["book"].find_one({"_id": review['book_id']})) is not None:
-            review['book_title'] = book['title'] 
-        reviews.append(review)
+        if isinstance(review["_id"], int):
+            if (user := await request.app.mongodb["user"].find_one({"_id": review['user_id']})) is not None:
+                review['user_username'] = user['username']
+            if (book := await request.app.mongodb["book"].find_one({"_id": review['book_id']})) is not None:
+                review['book_title'] = book['title'] 
+            reviews.append(review)
 
     return reviews
 
 @router.get("/get-review/{id}", response_description="Get review detail")
-async def get_review(id: str, request: Request):
+async def get_review(id: int, request: Request):
     if (review := await request.app.mongodb["review"].find_one({"_id": id})) is not None:
         return review
     
@@ -28,6 +39,7 @@ async def get_review(id: str, request: Request):
 @router.post("/create-review/")
 async def create_review(request: Request, review: ReviewModel = Body(...)):
     review = jsonable_encoder(review)
+    review['_id'] = int(await getNextSequence("reviewid", request))
     review['created_date'] = int(time.time())
     new_review = await request.app.mongodb["review"].insert_one(review)
     created_review = await request.app.mongodb["review"].find_one(
@@ -37,7 +49,7 @@ async def create_review(request: Request, review: ReviewModel = Body(...)):
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_review)
 
 @router.put("/update-review/{id}")
-async def update_review(id: str, request: Request, review: ReviewUpdateModel = Body(...)):
+async def update_review(id: int, request: Request, review: ReviewUpdateModel = Body(...)):
     review = {k: v for k, v in review.dict().items() if v is not None}
 
     if (len(review) >= 1):
@@ -60,7 +72,7 @@ async def update_review(id: str, request: Request, review: ReviewUpdateModel = B
     raise HTTPException(status_code=404, detail=f"review {id} not found")
 
 @router.delete("/delete-review/{id}")
-async def delete_review(id: str, request: Request):
+async def delete_review(id: int, request: Request):
     delete_review = await request.app.mongodb["review"].delete_one({"_id": id})
 
     if delete_review.deleted_count == 1:

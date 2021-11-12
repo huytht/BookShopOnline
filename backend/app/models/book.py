@@ -1,10 +1,9 @@
 from typing import Optional
-import uuid
 from pydantic import BaseModel, Field
 from datetime import datetime
 
 class BookModel(BaseModel):
-    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    id: Optional[int] = Field(alias="_id")
     isbn: str = Field(...)
     title: str = Field(...)
     summary_content: str = Field(...)
@@ -24,10 +23,11 @@ class BookModel(BaseModel):
                 "title": "Title",
                 "summary_content": "short content",
                 "author": "Author name",
-                "published_date": datetime(2021, 10, 7, 0, 0 , 0),
+                "published_date": datetime(2021, 10, 7, 0, 0, 0),
                 "price": 20000,
                 "image": "abc.jpg",
-                "category_id": [1, 2]
+                "category_id": [1, 2],
+                "isSold": False
             }
         } 
 

@@ -19,15 +19,9 @@ import {
 } from '@material-ui/core';
 import axios from 'axios';
 
-const InvoiceResult = ({ invoices }) => {
+const OrderDetailsResult = ({ orderDetails }) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-
-  const deleteInvoiceHandler = (id) => {
-    axios
-      .delete(`http://localhost:8000/invoice/delete-invoice/${id}`)
-      .then((res) => console.log(res));
-  };
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -44,21 +38,19 @@ const InvoiceResult = ({ invoices }) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Username</TableCell>
-                <TableCell>Created Date</TableCell>
-                <TableCell>Total</TableCell>
-                <TableCell>Payment</TableCell>
+                <TableCell>Order_id</TableCell>
+                <TableCell>ISBN</TableCell>
+                <TableCell>Title</TableCell>
+                <TableCell>Price</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {invoices.slice(0, limit).map((invoice) => (
-                <TableRow hover key={invoice._id}>
-                  <TableCell>{invoice.user_id}</TableCell>
-                  <TableCell>
-                    {moment.unix(invoice.created_date).format('DD/MM/yyyy')}
-                  </TableCell>
-                  <TableCell>{invoice.total_money}</TableCell>
-                  <TableCell>{invoice.payment_id}</TableCell>
+              {orderDetails.slice(0, limit).map((orderDetail) => (
+                <TableRow hover key={orderDetail._id}>
+                  <TableCell>{orderDetail.order_id}</TableCell>
+                  <TableCell>{orderDetail.book.isbn}</TableCell>
+                  <TableCell>{orderDetail.book.title}</TableCell>
+                  <TableCell>{orderDetail.book.price}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -67,7 +59,7 @@ const InvoiceResult = ({ invoices }) => {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={invoices.length}
+        count={orderDetails.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -78,8 +70,8 @@ const InvoiceResult = ({ invoices }) => {
   );
 };
 
-InvoiceResult.propTypes = {
-  invoices: PropTypes.array.isRequired
+OrderDetailsResult.propTypes = {
+  orderDetails: PropTypes.array.isRequired
 };
 
-export default InvoiceResult;
+export default OrderDetailsResult;
