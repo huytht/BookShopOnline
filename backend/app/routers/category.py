@@ -106,7 +106,7 @@ async def check_category(name: str, request: Request):
 @router.get("/check-category/{name}/{id}")
 async def check_category(name: str, id: int, request: Request):
     for category in await list_category(request):
-        if category['name'].lower() == name.lower() & category['_id'] != id:
+        if category['name'].lower() == name.lower() and category['_id'] != id:
             return True
 
     return False

@@ -91,7 +91,7 @@ async def check_payment(name: str, request: Request):
 @router.get("/check-payment/{name}/{id}")
 async def check_payment(name: str, id: int, request: Request):
     for payment in await list_payment(request):
-        if payment['name'].lower() == name.lower() & payment['_id'] != id:
+        if payment['name'].lower() == name.lower() and payment['_id'] != id:
             return True
 
     return False

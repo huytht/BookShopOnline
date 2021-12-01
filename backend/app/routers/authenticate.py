@@ -1,11 +1,11 @@
-from starlette.requests import Request
 from ..models.user import UserModel, UserUpdateModel, LoginModel
 from jose import JWTError, jwt
-from fastapi import Depends, HTTPException, status, APIRouter
+from fastapi import Depends, HTTPException, status, APIRouter, Request
 from typing import Optional
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
+from .user import get_all_role
 
 router = APIRouter()
 
@@ -17,9 +17,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
@@ -55,8 +52,10 @@ async def validate_user(model: LoginModel, request: Request):
         if user and verify_password(model.password, user['password']):
             access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
             access_token = create_access_token(
-                data={"username": user['username'], "email": user['email'], "role": user['authLevel']}, expires_delta=access_token_expires
+                data={"username": user['username'], "id": user['_id']}, expires_delta=access_token_expires
             )
-            return {"success": True, "data": access_token}
+            return {"success": True, "id": user['_id'], "username": user['username'], "email": user['email'], "roles": await get_all_role(user['_id'], request), "accessToken": access_token}
     else:
         return {"success": False, "message": "Invalid username/password"}
+
+

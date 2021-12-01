@@ -2,13 +2,14 @@ from fastapi import APIRouter, Body, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from datetime import datetime
+from passlib.context import CryptContext
 from ..models.user import UserModel, UserUpdateModel
-from .authenticate import get_password_hash
 import time
 
 router = APIRouter()
 
 TIME_FORMAT='%Y-%m-%dT%H:%M:%S'
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 async def getNextSequence(name: str, request: Request):
     ret = await request.app.mongodb["user"].find_one_and_update(
@@ -19,6 +20,10 @@ async def getNextSequence(name: str, request: Request):
     )
 
     return f"{ret['seq']}"
+
+    
+def get_password_hash(password):
+    return pwd_context.hash(password)
 
 @router.get("/", response_description="List all user")
 async def list_users(request: Request):
@@ -36,11 +41,22 @@ async def get_user(id: int, request: Request):
     
     raise HTTPException(status_code=404, detail="User {id} not found")
 
+@router.get("/get-all-role/{id}", response_description="Get all role")
+async def get_all_role(id: int, request: Request):
+    roles = []
+    for user_role in await request.app.mongodb["users_roles"].find().to_list(length=1000):
+        if isinstance(user_role['_id'], int):
+            if (user_role['user_id'] == id):
+                if (role := await request.app.mongodb["role"].find_one({"_id": user_role['role_id']})) is not None:
+                    roles.append(role['name'])
+
+    return roles
+
 @router.post("/create-user/")
 async def create_user(request: Request, user: UserModel = Body(...)):
     user = jsonable_encoder(user)
     user['password'] = get_password_hash(user['password'])
-    user['date_of_birth'] = datetime.strptime(user['date_of_birth'], TIME_FORMAT + "+00:00").timestamp()
+    # user['date_of_birth'] = datetime.strptime(user['date_of_birth'], TIME_FORMAT + "+00:00").timestamp()
     user['_id'] = int(await getNextSequence("userid", request))
     user['registration_date'] = int(time.time())
     new_user = await request.app.mongodb["user"].insert_one(user)
@@ -99,7 +115,7 @@ async def check_user(username: str, request: Request):
 async def check_user(username: str, id: int, request: Request):
 
     for user in await list_users(request):
-        if user['username'] == username & user['_id'] != id:
+        if user['username'] == username and user['_id'] != id:
             return True
 
     return False

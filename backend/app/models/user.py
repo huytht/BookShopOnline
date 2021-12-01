@@ -8,14 +8,14 @@ from datetime import datetime
 
 class UserModel(BaseModel):
     id: Optional[int] = Field(alias="_id")
-    fullname: str = Field(...)
+    fullname: Optional[str] = Field(...)
     username: str = Field(...)
     password: str = Field(...)
     email: str = Field(...)
-    date_of_birth: datetime
-    gender: int = Field(...)
+    date_of_birth: Optional[datetime]
+    gender: Optional[int] = Field(...)
+    avatar: Optional[str] = Field(default_factory="default-avatar.jpg")
     registration_date: Optional[datetime]
-    authLevel: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -27,7 +27,6 @@ class UserModel(BaseModel):
                 "email": "email",
                 "date_of_birth": datetime(2021, 10, 7, 0, 0, 0),
                 "gender": 1,
-                "authLevel": "user"
             }
 
         }
@@ -40,7 +39,7 @@ class UserUpdateModel(BaseModel):
     email: Optional[str]
     date_of_birth: Optional[datetime]
     gender: Optional[int]
-    authLevel: Optional[str]
+    avatar: Optional[str]
 
     class Config:
         allow_population_by_field_name = True
@@ -52,7 +51,6 @@ class UserUpdateModel(BaseModel):
                 "email": "email",
                 "date_of_birth": datetime(2021, 10, 7, 0, 0, 0),
                 "gender": 1,
-                "authLevel": "user"
             }
         }
 
