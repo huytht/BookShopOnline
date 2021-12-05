@@ -1,4 +1,5 @@
-import { useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
@@ -12,10 +13,44 @@ import {
 import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import InputIcon from '@material-ui/icons/Input';
+import { useDispatch, useSelector } from 'react-redux';
 import Logo from './Logo';
+import { clearMessage } from '../actions/message';
+import { history } from '../helpers/history';
+import EventBus from '../common/EventBus';
+import { logout } from '../actions/auth';
+import Login from '../pages/Login';
 
 const DashboardNavbar = ({ onMobileNavOpen, ...rest }) => {
   const [notifications] = useState([]);
+  const user = useSelector((state) => state.auth.user);
+  const [showAdminBoard, setShowAdminBoard] = useState(false);
+  const [currentUser, setCurrentUser] = useState(undefined);
+  const dispatch = useDispatch();
+
+  history.listen((location) => {
+    dispatch(clearMessage()); // clear message when changing location
+  });
+
+  useEffect(() => {
+    if (user) {
+      setCurrentUser(user);
+      setShowAdminBoard(user.roles.includes('ROLE_ADMIN'));
+    }
+
+    EventBus.on('logout', () => {
+      this.logOut();
+    });
+    return () => {
+      EventBus.remove('logout');
+    };
+  });
+
+  const logOut = () => {
+    dispatch(logout());
+    setShowAdminBoard(false);
+    setCurrentUser(undefined);
+  };
 
   return (
     <AppBar
@@ -37,7 +72,7 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }) => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          <IconButton color="inherit">
+          <IconButton LinkComponent={<Login />} onClick={logOut} color="inherit">
             <InputIcon />
           </IconButton>
         </Hidden>

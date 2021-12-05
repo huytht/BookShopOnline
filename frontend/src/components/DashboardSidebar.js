@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import {
   Avatar,
   Box,
@@ -25,69 +26,78 @@ import {
   FileText as FileTextIcon,
   FileMinus as FileMinusIcon,
   BarChart2,
-  Layers,
+  Layers
 } from 'react-feather';
 import NavItem from './NavItem';
 
-const user = {
-  avatar: '/static/images/avatars/avatar_6.png',
-  jobTitle: 'Senior Developer',
-  name: 'Katarina Smith'
-};
-
 const items = [
   {
-    href: '/app/dashboard',
+    href: '/dashboard',
     icon: BarChartIcon,
     title: 'Dashboard'
   },
   {
-    href: '/app/users',
+    href: '/admin/users',
     icon: UsersIcon,
     title: 'Users'
   },
   {
-    href: '/app/category',
+    href: '/admin/category',
     icon: BookIcon,
     title: 'Category'
   },
   {
-    href: '/app/book',
+    href: '/admin/book',
     icon: BookOpenIcon,
     title: 'Book'
   },
   {
-    href: '/app/payment',
+    href: '/admin/book-details',
+    icon: BookOpenIcon,
+    title: 'Book Details'
+  },
+  {
+    href: '/admin/payment',
     icon: CreditCardIcon,
     title: 'Payment'
   },
   {
-    href: '/app/order',
+    href: '/admin/order',
     icon: FileTextIcon,
     title: 'Order'
   },
   {
-    href: '/app/orderdetails',
+    href: '/admin/orderdetails',
     icon: FileMinusIcon,
     title: 'Order Details'
   },
   {
-    href: '/app/reviewbook',
+    href: '/admin/reviewbook',
     icon: BarChart2,
     title: 'Review Book'
   },
   {
-    href: '/app/totalrevenue',
+    href: '/admin/publisher',
+    icon: UsersIcon,
+    title: 'Publisher'
+  },
+  {
+    href: '/admin/totalrevenue',
     icon: Layers,
     title: 'Total Revenu'
   },
   {
-    href: '/app/account',
+    href: '/profile',
+    icon: UserIcon,
+    title: 'Profile'
+  },
+  {
+    href: '/admin/account',
     icon: UserIcon,
     title: 'Account'
   },
   {
-    href: '/app/settings',
+    href: '/settings',
     icon: SettingsIcon,
     title: 'Settings'
   },
@@ -110,11 +120,13 @@ const items = [
 
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {
   const location = useLocation();
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     if (openMobile && onMobileClose) {
       onMobileClose();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   const content = (
@@ -135,26 +147,23 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
       >
         <Avatar
           component={RouterLink}
-          src={user.avatar}
+          // src={user.avatar}
           sx={{
             cursor: 'pointer',
             width: 64,
             height: 64
           }}
-          to="/app/account"
+          to="/account"
         />
-        <Typography
-          color="textPrimary"
-          variant="h5"
-        >
-          {user.name}
+        <Typography color="textPrimary" variant="h5">
+          {user.username}
         </Typography>
-        <Typography
+        {/* <Typography
           color="textSecondary"
           variant="body2"
         >
           {user.jobTitle}
-        </Typography>
+        </Typography> */}
       </Box>
       <Divider />
       <Box sx={{ p: 2 }}>
@@ -168,44 +177,6 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
             />
           ))}
         </List>
-      </Box>
-      <Box sx={{ flexGrow: 1 }} />
-      <Box
-        sx={{
-          backgroundColor: 'background.default',
-          m: 2,
-          p: 2
-        }}
-      >
-        <Typography
-          align="center"
-          gutterBottom
-          variant="h4"
-        >
-          Need more?
-        </Typography>
-        <Typography
-          align="center"
-          variant="body2"
-        >
-          Upgrade to PRO version and access 20 more screens
-        </Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            pt: 2
-          }}
-        >
-          <Button
-            color="primary"
-            component="a"
-            href="https://react-material-kit.devias.io"
-            variant="contained"
-          >
-            See PRO version
-          </Button>
-        </Box>
       </Box>
     </Box>
   );
@@ -253,7 +224,7 @@ DashboardSidebar.propTypes = {
 };
 
 DashboardSidebar.defaultProps = {
-  onMobileClose: () => { },
+  onMobileClose: () => {},
   openMobile: false
 };
 
