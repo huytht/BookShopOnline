@@ -42,6 +42,26 @@ async def list_books(request: Request):
 
     return books
 
+@router.get("/list-best-book", response_description="List best book")
+async def list_best_books(request: Request):
+    books = []
+
+    for book in await request.app.mongodb["book"].find().to_list(length=8):
+        if isinstance(book["_id"], int):
+            books.append(book)
+
+    return books
+
+@router.get("/list-newest-book", response_description="List newest book")
+async def list_newest_books(request: Request):
+    books = []
+
+    for book in await request.app.mongodb["book"].find(sort=[('$natural', -1)]).to_list(length=8):
+        if isinstance(book["_id"], int):
+            books.append(book)
+
+    return books
+
 
 @router.get("/get-book/{id}", response_description="Get book detail")
 async def get_book(id: int, request: Request):
