@@ -25,10 +25,10 @@ import Profile from './components/profile';
 import PublisherList from './pages/PublisherList';
 import PublisherForm from './components/publisher/PublisherForm';
 
-export const routesAdmin = (isLoggedIn) => [
+export const routesAdmin = () => [
   {
     path: '/admin',
-    element: isLoggedIn ? <DashboardLayout /> : <Navigate to="/login" />,
+    element: <DashboardLayout />,
     children: [
       { path: 'account', element: <Account /> },
       { path: 'users', element: <UserList /> },
@@ -50,12 +50,23 @@ export const routesAdmin = (isLoggedIn) => [
       { path: '/', element: <Navigate to="/dashboard" /> },
       // { path: '*', element: <Navigate to="/404" /> }
     ]
-  }
-];
-export const routesUser = (isLoggedIn) => [
+  },
   {
     path: '/',
-    element: isLoggedIn ? <DashboardLayout /> : <Navigate to="/login" />,
+    element: <MainLayout />,
+    children: [
+      { path: 'login', element: <Login /> },
+      { path: 'register', element: <Register /> },
+      // { path: '404', element: <NotFound /> },
+      { path: '/', element: <Navigate to="/admin/book" /> },
+      // { path: '*', element: <Navigate to="/404" /> }
+    ]
+  }
+];
+export const routesUser = () => [
+  {
+    path: '/',
+    element: <DashboardLayout />,
     children: [
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'profile', element: <Profile /> },
@@ -76,10 +87,10 @@ export const routesUser = (isLoggedIn) => [
     ]
   }
 ];
-export const routes = (isLoggedIn) => [
+export const routes = () => [
   {
     path: '/',
-    element: !isLoggedIn ? <MainLayout /> : <Navigate to="/login" />,
+    element: <MainLayout />,
     children: [
       // { path: 'profile', element: <Profile /> },
       { path: 'login', element: <Login /> },

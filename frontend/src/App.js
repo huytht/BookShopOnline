@@ -20,9 +20,9 @@ const App = () => {
   // const [currentUser, setCurrentUser] = useState(undefined);
   const dispatch = useDispatch();
 
-  history.listen((location) => {
-    dispatch(clearMessage()); // clear message when changing location
-  });
+  // history.listen((location) => {
+  //   dispatch(clearMessage()); // clear message when changing location
+  // });
 
   // useEffect(() => {
   //   if (user) {
@@ -44,7 +44,7 @@ const App = () => {
   //   setCurrentUser(undefined);
   // };
 
-  const contentAdmin = useRoutes(routesAdmin(true));
+  const contentAdmin = useRoutes(routesAdmin());
   // const contentUser = useRoutes(routesUser(isLoggedIn));
   // const content = useRoutes(routes(isLoggedIn));
 

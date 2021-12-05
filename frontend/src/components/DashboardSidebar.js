@@ -155,9 +155,9 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
           }}
           to="/account"
         />
-        <Typography color="textPrimary" variant="h5">
+        {/* <Typography color="textPrimary" variant="h5">
           {user.username}
-        </Typography>
+        </Typography> */}
         {/* <Typography
           color="textSecondary"
           variant="body2"
