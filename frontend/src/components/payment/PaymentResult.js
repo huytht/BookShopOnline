@@ -25,7 +25,7 @@ const PaymentResult = ({ payments }) => {
 
   const deletePaymentHandler = (id) => {
     axios
-      .delete(`http://localhost:8000/payment/delete-payment/${id}`)
+      .delete(`${process.env.REACT_APP_API_ENDPOINT}/payment/delete-payment/${id}`)
       .then((res) => console.log(res));
   };
 
@@ -59,7 +59,7 @@ const PaymentResult = ({ payments }) => {
                   <TableCell style={{ textAlign: 'center' }}>
                     <IconButton
                       component={RouterLink}
-                      to={`/app/payment-form?id=${payment._id}`}
+                      to={`/admin/payment-form?id=${payment._id}`}
                     >
                       <EditIcon />
                     </IconButton>

@@ -9,7 +9,7 @@ const PaymentList = () => {
   const [payments, setPayments] = useState([]);
   // Read all payment
   useEffect(() => {
-    axios.get('http://localhost:8000/payment/').then((res) => {
+    axios.get(`${process.env.REACT_APP_API_ENDPOINT}/payment/`).then((res) => {
       setPayments(res.data);
     });
     const interval = setInterval(payments, 1000);

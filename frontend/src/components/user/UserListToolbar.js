@@ -24,7 +24,7 @@ const UserListToolbar = (props) => (
         color="primary"
         variant="contained"
         component={RouterLink}
-        to="/app/user-form"
+        to="/admin/user-form"
       >
         ADD USER
       </Button>

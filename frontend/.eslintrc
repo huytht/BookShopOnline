@@ -5,7 +5,8 @@
     "browser": true
   },
   "extends": [
-    "airbnb"
+    "airbnb",
+    "plugin:react-hooks/recommended"
   ],
   "settings": {
     "import/resolver": {
@@ -48,6 +49,23 @@
     "react/jsx-curly-newline": "off",
     "react/jsx-boolean-value": "off",
     "arrow-body-style": "off",
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
+    "class-methods-use-this": "off",
+    "react/sort-comp": "off",
+    "react/button-has-type": "off",
+    "jsx-a11y/label-has-associated-control": "off",
+    "react/prefer-stateless-function": "off",
+    "react/jsx-one-expression-per-line": "off",
+    "react/no-array-index-key": "off",
+    "react/no-this-in-sfc": "off",
+    "semi": "off",
+    "quotes": "off",
+    "react/no-unused-state": "off",
+    "prefer-destructuring": "off",
+    "import/prefer-default-export": "off",
+    "import/no-extraneous-dependencies": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "no-alert": "off",
+    "no-trailing-spaces": "off"
   }
 }

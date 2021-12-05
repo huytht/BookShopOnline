@@ -28,7 +28,7 @@ const BookListToolbar = (props) => (
         color="primary"
         variant="contained"
         component={RouterLink}
-        to="/app/book-form"
+        to="/admin/book-form"
       >
         Add New Book
       </Button>

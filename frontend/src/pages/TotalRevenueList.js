@@ -9,7 +9,7 @@ const TotalRevenueList = () => {
   const [users, setUsers] = useState([]);
   // Read all user
   useEffect(() => {
-    axios.get('http://localhost:8000/user/').then((res) => {
+    axios.get(`${process.env.REACT_APP_API_ENDPOINT}/user/`).then((res) => {
       setUsers(res.data);
     });
     const interval = setInterval(users, 1000);

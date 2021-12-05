@@ -9,7 +9,7 @@ const OrderList = () => {
   const [orders, setOrders] = useState([]);
   // Read all order
   useEffect(() => {
-    axios.get('http://localhost:8000/order/').then((res) => {
+    axios.get(`${process.env.REACT_APP_API_ENDPOINT}/order/`).then((res) => {
       setOrders(res.data);
     });
     const interval = setInterval(orders, 1000);

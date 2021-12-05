@@ -24,7 +24,7 @@ const PaymentToolbar = (props) => (
         color="primary"
         variant="contained"
         component={RouterLink}
-        to="/app/payment-form"
+        to="/admin/payment-form"
       >
         ADD PAYMENT
       </Button>

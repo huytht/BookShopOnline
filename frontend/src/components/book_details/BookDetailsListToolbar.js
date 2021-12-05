@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core';
 import { Search as SearchIcon } from 'react-feather';
 
-const CategoryToolbar = (props) => (
+const BookDetailsListToolbar = (props) => (
   <Box {...props}>
     <Box
       sx={{
@@ -24,9 +24,9 @@ const CategoryToolbar = (props) => (
         color="primary"
         variant="contained"
         component={RouterLink}
-        to="/admin/category-form"
+        to="/admin/book-details-form"
       >
-        ADD CATEGORY
+        Add New Book
       </Button>
     </Box>
     <Box sx={{ mt: 3 }}>
@@ -44,7 +44,7 @@ const CategoryToolbar = (props) => (
                   </InputAdornment>
                 )
               }}
-              placeholder="Search category"
+              placeholder="Search book"
               variant="outlined"
             />
           </Box>
@@ -54,4 +54,4 @@ const CategoryToolbar = (props) => (
   </Box>
 );
 
-export default CategoryToolbar;
+export default BookDetailsListToolbar;

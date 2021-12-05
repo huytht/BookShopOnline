@@ -25,7 +25,7 @@ const OrderResult = ({ orders }) => {
 
   const deleteOrderHandler = (id) => {
     axios
-      .delete(`http://localhost:8000/order/delete-order/${id}`)
+      .delete(`${process.env.REACT_APP_API_ENDPOINT}/order/delete-order/${id}`)
       .then((res) => console.log(res));
   };
 
@@ -44,21 +44,31 @@ const OrderResult = ({ orders }) => {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell>Id</TableCell>
                 <TableCell>Full Name</TableCell>
-                <TableCell>Created Date</TableCell>
-                <TableCell>Total</TableCell>
+                <TableCell>Total Quantity</TableCell>
+                <TableCell>Total Money</TableCell>
+                <TableCell>Billing Address Id</TableCell>
+                <TableCell>Shipping Address Id</TableCell>                
                 <TableCell>Payment</TableCell>
+                <TableCell>Created Date</TableCell>
+                <TableCell>Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {orders.slice(0, limit).map((order) => (
                 <TableRow hover key={order._id}>
+                  <TableCell>{order._id}</TableCell>
                   <TableCell>{order.user_id.fullname}</TableCell>
+                  <TableCell>{order.total_quantity}</TableCell>
+                  <TableCell>{order.total_money}</TableCell>
+                  <TableCell>{order.billing_address_id}</TableCell>
+                  <TableCell>{order.shipping_address_id}</TableCell>
+                  <TableCell>{order.payment_id.name}</TableCell>
                   <TableCell>
                     {moment.unix(order.created_date).format('DD/MM/yyyy')}
                   </TableCell>
-                  <TableCell>{order.total_money}</TableCell>
-                  <TableCell>{order.payment_id.name}</TableCell>
+                  <TableCell>{order.status}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

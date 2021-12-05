@@ -7,9 +7,12 @@ import OrderDetailsToolbar from '../components/order_details/OrderDetailsToolbar
 
 const OrderDetailsList = () => {
   const [orderDetails, setOrderDetails] = useState([]);
+  const config = {
+    headers: { Pragma: 'no-cache' }
+  };
   // Read all orderDetail
   useEffect(() => {
-    axios.get('http://localhost:8000/order-detail/').then((res) => {
+    axios.get(`${process.env.REACT_APP_API_ENDPOINT}/order-detail/`, config).then((res) => {
       setOrderDetails(res.data);
     });
     const interval = setInterval(orderDetails, 1000);

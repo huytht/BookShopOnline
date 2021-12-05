@@ -55,7 +55,7 @@ async def validate_user(model: LoginModel, request: Request):
                 data={"username": user['username'], "id": user['_id']}, expires_delta=access_token_expires
             )
             return {"success": True, "id": user['_id'], "username": user['username'], "email": user['email'], "roles": await get_all_role(user['_id'], request), "accessToken": access_token}
+        else:
+            return {"success": False, "message": "Incorrect password"}
     else:
         return {"success": False, "message": "Invalid username/password"}
-
-

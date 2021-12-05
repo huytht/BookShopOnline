@@ -18,6 +18,7 @@ import {
   TableRow
 } from '@material-ui/core';
 import axios from 'axios';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 const UserListResults = ({ users }) => {
   const [limit, setLimit] = useState(10);
@@ -25,7 +26,7 @@ const UserListResults = ({ users }) => {
 
   const deleteUserHandler = (id) => {
     axios
-      .delete(`http://localhost:8000/user/delete-user/${id}`)
+      .delete(`${process.env.REACT_APP_API_ENDPOINT}/user/delete-user/${id}`)
       .then((res) => console.log(res));
   };
 
@@ -44,15 +45,14 @@ const UserListResults = ({ users }) => {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell>Avatar</TableCell>
                 <TableCell>Full Name</TableCell>
                 <TableCell>Username</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Gender</TableCell>
                 <TableCell>Date of birth</TableCell>
-
                 <TableCell>Registration date</TableCell>
-                <TableCell>AuthLevel</TableCell>
-                <TableCell colSpan={2} style={{ textAlign: 'center' }}>
+                <TableCell>
                   Action
                 </TableCell>
               </TableRow>
@@ -60,6 +60,16 @@ const UserListResults = ({ users }) => {
             <TableBody>
               {users.slice(0, limit).map((user) => (
                 <TableRow hover key={user._id}>
+                  <TableCell>
+                    <LazyLoadImage
+                      // effect="blur"
+                      width="100px"
+                      height="100px"
+                      src={`https://firebasestorage.googleapis.com/v0/b/bookshoponline-85349.appspot.com/o/user%2F${user.avatar}?alt=media`}
+                      alt=""
+                      placeholderSrc={`${process.env.PUBLIC_URL}/static/images/default.png`}
+                    />
+                  </TableCell>
                   <TableCell>{user.fullname}</TableCell>
                   <TableCell>{user.username}</TableCell>
                   <TableCell>{user.email}</TableCell>
@@ -76,16 +86,13 @@ const UserListResults = ({ users }) => {
                   <TableCell>
                     {moment.unix(user.registration_date).format('DD/MM/yyyy')}
                   </TableCell>
-                  <TableCell>{user.authLevel}</TableCell>
                   <TableCell>
                     <IconButton
                       component={RouterLink}
-                      to={`/app/user-form?id=${user._id}`}
+                      to={`/admin/user-form?id=${user._id}`}
                     >
                       <EditIcon />
                     </IconButton>
-                  </TableCell>
-                  <TableCell>
                     <IconButton
                       onClick={() => {
                         deleteUserHandler(user._id);

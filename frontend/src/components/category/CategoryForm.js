@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useState, useEffect } from 'react';
 import {
   Box,
@@ -9,7 +11,7 @@ import {
   Grid
 } from '@material-ui/core';
 import axios from 'axios';
-import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
 import Controls from '../controls/Controls';
 import { useForm, Form } from '../useForm';
 
@@ -19,10 +21,15 @@ const CategoryForm = () => {
   };
 
   const [categoryExist, setCategoryExist] = useState(false);
+  const navigate = useNavigate();
 
   const validate = () => {
     const temp = {};
-    temp.name = !values.name ? 'This field is required.' : categoryExist ? 'Name has exist.' : '';
+    temp.name = !values.name
+      ? 'This field is required.'
+      : categoryExist
+      ? 'Name has exist.'
+      : '';
 
     setErrors({
       ...temp
@@ -34,14 +41,16 @@ const CategoryForm = () => {
     if (params.has('id')) {
       axios
         .get(
-          `http://localhost:8000/category/check-category/${
+          `${process.env.REACT_APP_API_ENDPOINT}/category/check-category/${
             values.name
           }/${params.get('id')}`
         )
         .then((res) => setCategoryExist(res.data));
     } else {
       axios
-        .get(`http://localhost:8000/category/check-category/${values.name}`)
+        .get(
+          `${process.env.REACT_APP_API_ENDPOINT}/category/check-category/${values.name}`
+        )
         .then((res) => setCategoryExist(res.data));
     }
   };
@@ -51,18 +60,34 @@ const CategoryForm = () => {
     useEffect(() => {
       const fetchCategoryData = async () => {
         const response = await fetch(
-          `http://localhost:8000/category/get-category/${params.get('id')}`
+          `${
+            process.env.REACT_APP_API_ENDPOINT
+          }/category/get-category/${params.get('id')}`
         );
         const fetchedCategory = await response.json();
 
         setValues(fetchedCategory);
       };
       fetchCategoryData();
+      const interval = setInterval(1000);
+
+      return () => {
+        clearInterval(interval);
+      };
     }, []);
   }
 
   const { values, setValues, errors, setErrors, handleInputChange, resetForm } =
     useForm(initValues, true, validate);
+
+  useEffect(() => {
+    if (values.name !== '') checkCategoryExist();
+    const interval = setInterval(1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [values.name]);
 
   const submitFormHandler = (event) => {
     event.preventDefault();
@@ -70,24 +95,25 @@ const CategoryForm = () => {
       if (params.has('id')) {
         axios
           .put(
-            `http://localhost:8000/category/update-category/${params.get(
-              'id'
-            )}`,
+            `${
+              process.env.REACT_APP_API_ENDPOINT
+            }/category/update-category/${params.get('id')}`,
             {
               name: values.name
             }
           )
           .then((res) => console.log(res));
-        window.alert('Update successfully!!');
+        navigate('/admin/category');
       } else {
         axios
-          .post('http://localhost:8000/category/create-category/', {
-            name: values.name
-          })
+          .post(
+            `${process.env.REACT_APP_API_ENDPOINT}/category/create-category/`,
+            {
+              name: values.name
+            }
+          )
           .then((res) => console.log(res));
-        window.alert('Insert successfully!!');
-
-        resetForm();
+        navigate('/admin/category');
       }
     }
   };
@@ -114,9 +140,6 @@ const CategoryForm = () => {
                 }}
                 value={values.name}
                 variant="outlined"
-                onBlur={() => {
-                  checkCategoryExist();
-                }}
               />
             </Grid>
           </Grid>

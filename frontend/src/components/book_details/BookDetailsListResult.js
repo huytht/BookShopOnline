@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -9,7 +10,6 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 import {
   Box,
   Card,
-  Checkbox,
   IconButton,
   Table,
   TableBody,
@@ -26,7 +26,7 @@ const BookListResult = ({ books }) => {
 
   const deleteBookHandler = (id) => {
     axios
-      .delete(`${process.env.REACT_APP_API_ENDPOINT}/book/delete-book/${id}`)
+      .delete(`${process.env.REACT_APP_API_ENDPOINT}/book-detail/delete-book-detail/${id}`)
       .then((res) => console.log(res));
   };
 
@@ -45,43 +45,26 @@ const BookListResult = ({ books }) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell />
                 <TableCell>Title</TableCell>
-                <TableCell>Author</TableCell>
-                <TableCell>Price</TableCell>
-                <TableCell>Publisher</TableCell>
-                <TableCell>Category</TableCell>
+                <TableCell>ISBN</TableCell>
+                <TableCell>Published Date</TableCell>
+                <TableCell>Status</TableCell>
                 <TableCell>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {books.slice(0, limit).map((book) => (
                 <TableRow hover key={book._id}>
+                  <TableCell>{book.book.title}</TableCell>
+                  <TableCell>{book.isbn}</TableCell>
                   <TableCell>
-                    <LazyLoadImage
-                      // effect="blur"
-                      width="100px"
-                      height="100px"
-                      src={`https://firebasestorage.googleapis.com/v0/b/bookshoponline-85349.appspot.com/o/book%2F${book.image}?alt=media`}
-                      alt=""
-                      placeholderSrc={`${process.env.PUBLIC_URL}/static/images/default.png`}
-                    />
+                    {moment.unix(book.published_date).format('DD/MM/yyyy')}
                   </TableCell>
-                  <TableCell>{book.title}</TableCell>
-                  <TableCell>{book.author}</TableCell>
-                  <TableCell>{book.price}</TableCell>
-                  <TableCell>{book.publisher.name}</TableCell>
-                  <TableCell>
-                    {book.category.map((category, idx) =>
-                      idx === book.category.length - 1
-                        ? category.concat('')
-                        : category.concat(' - ')
-                    )}
-                  </TableCell>
+                  <TableCell>{book.isSold ? 'SOLD' : 'AVAILABLE'}</TableCell>
                   <TableCell>
                     <IconButton
                       component={RouterLink}
-                      to={`/admin/book-form?id=${book._id}`}
+                      to={`/admin/book-details-form?id=${book._id}`}
                     >
                       <EditIcon />
                     </IconButton>

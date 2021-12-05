@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useState, useEffect } from 'react';
 import {
   Box,
@@ -72,14 +74,16 @@ const UserForm = () => {
     if (params.has('id')) {
       axios
         .get(
-          `http://localhost:8000/user/check-user/${
+          `${process.env.REACT_APP_API_ENDPOINT}/user/check-user/${
             values.username
           }/${params.get('id')}`
         )
         .then((res) => setUserExist(res.data));
     } else {
       axios
-        .get(`http://localhost:8000/user/check-user/${values.username}`)
+        .get(
+          `${process.env.REACT_APP_API_ENDPOINT}/user/check-user/${values.username}`
+        )
         .then((res) => setUserExist(res.data));
     }
   };
@@ -89,7 +93,9 @@ const UserForm = () => {
     useEffect(() => {
       const fetchUserData = async () => {
         const response = await fetch(
-          `http://localhost:8000/user/get-user/${params.get('id')}`
+          `${process.env.REACT_APP_API_ENDPOINT}/user/get-user/${params.get(
+            'id'
+          )}`
         );
         const fetchedUser = await response.json();
         fetchedUser.date_of_birth = moment
@@ -98,6 +104,11 @@ const UserForm = () => {
         setValues(fetchedUser);
       };
       fetchUserData();
+      const interval = setInterval(1000);
+
+      return () => {
+        clearInterval(interval);
+      };
     }, []);
   }
 
@@ -110,20 +121,25 @@ const UserForm = () => {
       const dob = Math.floor(new Date(values.date_of_birth).getTime() / 1000);
       if (params.has('id')) {
         axios
-          .put(`http://localhost:8000/user/update-user/${params.get('id')}`, {
-            username: values.username,
-            password: values.password,
-            date_of_birth: dob,
-            email: values.email,
-            gender: parseInt(values.gender, 10),
-            authLevel: values.authLevel
-          })
+          .put(
+            `${
+              process.env.REACT_APP_API_ENDPOINT
+            }/user/update-user/${params.get('id')}`,
+            {
+              username: values.username,
+              password: values.password,
+              date_of_birth: dob,
+              email: values.email,
+              gender: parseInt(values.gender, 10),
+              authLevel: values.authLevel
+            }
+          )
           .then((res) => console.log(res));
         window.alert('Update successfully!!');
       } else {
         const currentDate = Math.floor(new Date().getTime() / 1000);
         axios
-          .post('http://localhost:8000/user/create-user/', {
+          .post(`${process.env.REACT_APP_API_ENDPOINT}/user/create-user/`, {
             username: values.username,
             password: values.password,
             date_of_birth: dob,

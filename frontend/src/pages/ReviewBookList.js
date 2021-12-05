@@ -9,7 +9,7 @@ const ReviewBookList = () => {
   const [reviews, setReviews] = useState([]);
   // Read all review
   useEffect(() => {
-    axios.get('http://localhost:8000/review/').then((res) => {
+    axios.get(`${process.env.REACT_APP_API_ENDPOINT}/review/`).then((res) => {
       setReviews(res.data);
     });
     const interval = setInterval(reviews, 1000);

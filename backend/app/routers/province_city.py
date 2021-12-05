@@ -13,6 +13,7 @@ async def list_province_city(request: Request):
 
     return provinces_cities
 
+
 @router.get("/get-province_city/{code}", response_description="Get province city detail")
 async def get_province_city(code: str, request: Request):
     if (province_city := await request.app.mongodb["province_city"].find_one({"code": code})) is not None:
@@ -21,11 +22,11 @@ async def get_province_city(code: str, request: Request):
 
     raise HTTPException(status_code=404, detail="province_city {id} not found")
 
+
 @router.get("/get-town-district-by-province-city/{code}", response_description="Get list town district")
 async def get_town_district_list(code: str, request: Request):
     towns_districts = []
-    for town_district in await request.app.mongodb["town_district"].find().to_list(length=2000):
-        if town_district['parent_code'] == code:
-            town_district['_id'] = str(town_district['_id'])
-            towns_districts.append(town_district)
+    for town_district in await request.app.mongodb["town_district"].find_one({'parent_code' == code}).to_list(length=100):
+        town_district['_id'] = str(town_district['_id'])
+        towns_districts.append(town_district)
     return towns_districts

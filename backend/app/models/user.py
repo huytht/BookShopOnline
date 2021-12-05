@@ -4,8 +4,6 @@ from pydantic import BaseModel, Field, BaseConfig
 from datetime import datetime
 
 # Collection user
-
-
 class UserModel(BaseModel):
     id: Optional[int] = Field(alias="_id")
     fullname: Optional[str] = Field(...)
@@ -13,6 +11,7 @@ class UserModel(BaseModel):
     password: str = Field(...)
     email: str = Field(...)
     date_of_birth: Optional[datetime]
+    phone: Optional[str]
     gender: Optional[int] = Field(...)
     avatar: Optional[str] = Field(default_factory="default-avatar.jpg")
     registration_date: Optional[datetime]
@@ -25,6 +24,7 @@ class UserModel(BaseModel):
                 "username": "username",
                 "password": "password",
                 "email": "email",
+                "phone": "098xxxxx",
                 "date_of_birth": datetime(2021, 10, 7, 0, 0, 0),
                 "gender": 1,
             }
@@ -38,6 +38,7 @@ class UserUpdateModel(BaseModel):
     password: Optional[str]
     email: Optional[str]
     date_of_birth: Optional[datetime]
+    phone: Optional[str]
     gender: Optional[int]
     avatar: Optional[str]
 
@@ -49,6 +50,7 @@ class UserUpdateModel(BaseModel):
                 "username": "username",
                 "password": "password",
                 "email": "email",
+                "phone": "098xxxxx",
                 "date_of_birth": datetime(2021, 10, 7, 0, 0, 0),
                 "gender": 1,
             }

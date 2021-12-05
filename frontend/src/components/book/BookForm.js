@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef } from 'react';
 import {
   Box,
@@ -7,31 +9,25 @@ import {
   CardHeader,
   Divider,
   Grid,
-  Checkbox,
-  InputLabel,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
   FormHelperText
 } from '@material-ui/core';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import axios from 'axios';
 import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
 import Controls from '../controls/Controls';
 import { useForm, Form } from '../useForm';
 import { storage } from '../../firebase';
 
 const initValues = {
-  isbn: '',
   title: '',
   summary_content: '',
   author: '',
-  published_date: '',
   price: 0,
   image: '',
-  category_id: [],
-  isSold: false
+  publisher_id: 1,
+  category_id: []
 };
 
 const BookForm = () => {
@@ -42,22 +38,20 @@ const BookForm = () => {
   const [defaultVal, setDefaultVal] = useState([]);
   const [loading, setLoading] = useState(false);
   const animatedComponents = makeAnimated();
+  const [publishers, setPublishers] = useState([]);
+  const navigate = useNavigate();
 
   const validate = (fieldValues = values) => {
     const temp = {};
-    temp.isbn = !fieldValues.isbn
+    temp.title = !fieldValues.title
       ? 'This field is required.'
       : bookExist
-      ? 'ISBN has exist.'
+      ? 'This title has exist'
       : '';
-    temp.title = fieldValues.title ? '' : 'This field is required.';
     temp.summary_content = fieldValues.summary_content
       ? ''
       : 'This field is required.';
     temp.author = fieldValues.author ? '' : 'This field is required.';
-    temp.published_date = fieldValues.published_date
-      ? ''
-      : 'This field is required.';
     temp.category_id =
       selectedCategories.length !== 0 ? '' : 'This field is required.';
 
@@ -79,9 +73,28 @@ const BookForm = () => {
 
   // Read all category
   useEffect(() => {
-    axios.get('http://localhost:8000/category/').then((res) => {
+    axios.get(`${process.env.REACT_APP_API_ENDPOINT}/category/`).then((res) => {
       setCategories(res.data);
     });
+    const interval = setInterval(1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Read all publisher
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_API_ENDPOINT}/publisher/`)
+      .then((res) => {
+        setPublishers(res.data);
+      });
+    const interval = setInterval(1000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   // HandleChange for dropdown multiselect
@@ -104,9 +117,21 @@ const BookForm = () => {
   };
 
   const checkBookExist = () => {
-    axios
-      .get(`http://localhost:8000/book/check-book/${values.isbn}`)
-      .then((res) => setBookExist(res.data));
+    if (!params.has('id')) {
+      axios
+        .get(
+          `${process.env.REACT_APP_API_ENDPOINT}/book/check-book/${values.title}`
+        )
+        .then((res) => setBookExist(res.data));
+    } else {
+      axios
+        .get(
+          `${process.env.REACT_APP_API_ENDPOINT}/book/check-book/${
+            values.title
+          }/${params.get('id')}`
+        )
+        .then((res) => setBookExist(res.data));
+    }
   };
 
   const params = new URL(document.location).searchParams;
@@ -114,7 +139,9 @@ const BookForm = () => {
     useEffect(() => {
       const fetchBookData = async () => {
         const response = await fetch(
-          `http://localhost:8000/book/get-book/${params.get('id')}`
+          `${process.env.REACT_APP_API_ENDPOINT}/book/get-book/${params.get(
+            'id'
+          )}`
         );
         const fetchedBook = await response.json();
         fetchedBook.published_date = moment
@@ -123,6 +150,11 @@ const BookForm = () => {
         setValues(fetchedBook);
       };
       fetchBookData();
+      const interval = setInterval(1000);
+
+      return () => {
+        clearInterval(interval);
+      };
     }, []);
   }
 
@@ -136,19 +168,35 @@ const BookForm = () => {
   };
 
   useEffect(() => {
+    if (values.title !== '') checkBookExist();
+    const interval = setInterval(1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [values.title]);
+
+  useEffect(() => {
     setDefaultVal([]);
     setLoading(true);
+    const interval = setInterval(1000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [loading]);
 
   useEffect(() => {
     if (defaultVal.length > 0) {
-      console.log(getDefaultCategory());
       setSelectedCategories(getDefaultCategory());
     } else if (params.has('id') && !defaultVal.length) {
       axios
-        .post('http://localhost:8000/category/get-list-category/', {
-          idList: values.category_id
-        })
+        .post(
+          `${process.env.REACT_APP_API_ENDPOINT}/category/get-list-category/`,
+          {
+            idList: values.category_id
+          }
+        )
         .then((res) => {
           setDefaultVal(res.data);
         })
@@ -157,40 +205,45 @@ const BookForm = () => {
         });
       console.log(defaultVal);
     }
+    const interval = setInterval(1000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [defaultVal]);
 
   const submitFormHandler = (event) => {
     event.preventDefault();
-    console.log(errors.category_id);
     if (validate()) {
-      const pd = Math.floor(new Date(values.published_date).getTime() / 1000);
       if (params.has('id')) {
         axios
-          .put(`http://localhost:8000/book/update-book/${params.get('id')}`, {
-            isbn: values.isbn,
-            title: values.title,
-            summary_content: values.summary_cotent,
-            author: values.author,
-            published_date: pd,
-            price: parseInt(values.price, 10),
-            image: image.name,
-            category_id: selectedCategories.map((item) => item.value),
-            isSold: values.isSold
-          })
+          .put(
+            `${
+              process.env.REACT_APP_API_ENDPOINT
+            }/book/update-book/${params.get('id')}`,
+            {
+              title: values.title,
+              summary_content: values.summary_cotent,
+              author: values.author,
+              price: parseInt(values.price, 10),
+              image: image.name,
+              publisher_id: values.publisher_id,
+              category_id: selectedCategories.map((item) => item.value)
+            }
+          )
           .then((res) => console.log(res));
+        navigate('/admin/book');
       } else {
         const uploadBook = storage.ref(`book/${image.name}`).put(image);
         axios
-          .post('http://localhost:8000/book/create-book/', {
-            isbn: values.isbn,
+          .post(`${process.env.REACT_APP_API_ENDPOINT}/book/create-book/`, {
             title: values.title,
             summary_content: values.summary_content,
             author: values.author,
-            published_date: pd,
             price: parseInt(values.price, 10),
             image: image.name,
-            category_id: selectedCategories.map((item) => item.value),
-            isSold: values.isSold
+            publisher_id: values.publisher_id,
+            category_id: selectedCategories.map((item) => item.value)
           })
           .then((res) => console.log(res));
         // Upload image book
@@ -210,6 +263,7 @@ const BookForm = () => {
               });
           }
         );
+        navigate('/admin/book');
       }
       // resetForm();
     }
@@ -222,22 +276,6 @@ const BookForm = () => {
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
-            <Grid item md={6} xs={12}>
-              <Controls.Input
-                label="ISBN"
-                name="isbn"
-                onChange={handleInputChange}
-                error={errors.isbn}
-                InputLabelProps={{
-                  shrink: true
-                }}
-                value={values.isbn}
-                variant="outlined"
-                onBlur={() => {
-                  checkBookExist();
-                }}
-              />
-            </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
                 label="Title"
@@ -285,21 +323,6 @@ const BookForm = () => {
             </Grid>
             <Grid item md={6} xs={12}>
               <Controls.Input
-                label="Published Date"
-                name="published_date"
-                onChange={handleInputChange}
-                type="date"
-                InputLabelProps={{
-                  shrink: true
-                }}
-                error={errors.published_date}
-                SelectProps={{ native: true }}
-                value={values.published_date}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <Controls.Input
                 label="Price"
                 name="price"
                 type="numeric"
@@ -325,6 +348,29 @@ const BookForm = () => {
             ) : (
               ''
             )}
+            <Grid item md={6} xs={12}>
+              <Controls.Input
+                label="Choose publisher"
+                name="publisher_id"
+                key={values.publisher_id}
+                select
+                InputLabelProps={{
+                  shrink: true
+                }}
+                onChange={handleInputChange}
+                SelectProps={{
+                  native: true
+                }}
+                value={values.publisher_id}
+                variant="outlined"
+              >
+                {publishers.map((publisher) => (
+                  <option key={publisher._id} value={publisher._id}>
+                    {publisher.name}
+                  </option>
+                ))}
+              </Controls.Input>
+            </Grid>
             <Grid item md={6} xs={12}>
               <p>&nbsp;Category</p>
               <Select
@@ -353,25 +399,6 @@ const BookForm = () => {
                 onChange={handleFileChange}
                 variant="outlined"
               />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <Controls.Input
-                label="Is Sold"
-                name="isSold"
-                select
-                InputLabelProps={{
-                  shrink: true
-                }}
-                onChange={handleInputChange}
-                SelectProps={{
-                  native: true
-                }}
-                value={values.isSold}
-                variant="outlined"
-              >
-                <option value="true">True</option>
-                <option value="false">False</option>
-              </Controls.Input>
             </Grid>
           </Grid>
         </CardContent>

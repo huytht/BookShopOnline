@@ -42,15 +42,17 @@ const OrderDetailsResult = ({ orderDetails }) => {
                 <TableCell>ISBN</TableCell>
                 <TableCell>Title</TableCell>
                 <TableCell>Price</TableCell>
+                <TableCell>Quantity</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {orderDetails.slice(0, limit).map((orderDetail) => (
                 <TableRow hover key={orderDetail._id}>
                   <TableCell>{orderDetail.order_id}</TableCell>
-                  <TableCell>{orderDetail.book.isbn}</TableCell>
+                  <TableCell>{orderDetail.book_detail.isbn}</TableCell>
                   <TableCell>{orderDetail.book.title}</TableCell>
                   <TableCell>{orderDetail.book.price}</TableCell>
+                  <TableCell>{orderDetail.quantity}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

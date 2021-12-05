@@ -9,7 +9,7 @@ const Categorylist = () => {
   const [categories, setCategories] = useState([]);
   // Read all category
   useEffect(() => {
-    axios.get('http://localhost:8000/category/').then((res) => {
+    axios.get(`${process.env.REACT_APP_API_ENDPOINT}/category/`).then((res) => {
       setCategories(res.data);
     });
     const interval = setInterval(categories, 1000);

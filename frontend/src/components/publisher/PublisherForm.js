@@ -15,19 +15,19 @@ import { useNavigate } from 'react-router-dom';
 import Controls from '../controls/Controls';
 import { useForm, Form } from '../useForm';
 
-const PaymentForm = () => {
+const PublisherForm = () => {
   const initValues = {
     name: ''
   };
 
-  const [paymentExist, setPaymentExist] = useState(false);
+  const [publisherExist, setPublisherExist] = useState(false);
   const navigate = useNavigate();
 
   const validate = () => {
     const temp = {};
     temp.name = !values.name
       ? 'This field is required.'
-      : paymentExist
+      : publisherExist
       ? 'Name has exist.'
       : '';
 
@@ -37,38 +37,38 @@ const PaymentForm = () => {
     return Object.values(temp).every((x) => x === '');
   };
 
-  const checkPaymentExist = () => {
+  const checkPublisherExist = () => {
     if (params.has('id')) {
       axios
         .get(
-          `${process.env.REACT_APP_API_ENDPOINT}/payment/check-payment/${
+          `${process.env.REACT_APP_API_ENDPOINT}/publisher/check-publisher/${
             values.name
           }/${params.get('id')}`
         )
-        .then((res) => setPaymentExist(res.data));
+        .then((res) => setPublisherExist(res.data));
     } else {
       axios
         .get(
-          `${process.env.REACT_APP_API_ENDPOINT}/payment/check-payment/${values.name}`
+          `${process.env.REACT_APP_API_ENDPOINT}/publisher/check-publisher/${values.name}`
         )
-        .then((res) => setPaymentExist(res.data));
+        .then((res) => setPublisherExist(res.data));
     }
   };
 
   const params = new URL(document.location).searchParams;
   if (params.has('id')) {
     useEffect(() => {
-      const fetchPaymentData = async () => {
+      const fetchPublisherData = async () => {
         const response = await fetch(
           `${
             process.env.REACT_APP_API_ENDPOINT
-          }/payment/get-payment/${params.get('id')}`
+          }/publisher/get-publisher/${params.get('id')}`
         );
-        const fetchedPayment = await response.json();
+        const fetchedPublisher = await response.json();
 
-        setValues(fetchedPayment);
+        setValues(fetchedPublisher);
       };
-      fetchPaymentData();
+      fetchPublisherData();
       const interval = setInterval(1000);
 
       return () => {
@@ -81,7 +81,7 @@ const PaymentForm = () => {
     useForm(initValues, true, validate);
 
   useEffect(() => {
-    if (values.name !== '') checkPaymentExist();
+    if (values.name !== '') checkPublisherExist();
     const interval = setInterval(1000);
 
     return () => {
@@ -97,23 +97,23 @@ const PaymentForm = () => {
           .put(
             `${
               process.env.REACT_APP_API_ENDPOINT
-            }/payment/update-payment/${params.get('id')}`,
+            }/publisher/update-publisher/${params.get('id')}`,
             {
               name: values.name
             }
           )
           .then((res) => console.log(res));
-        navigate('/admin/payment');
+        navigate('/admin/publisher');
       } else {
         axios
           .post(
-            `${process.env.REACT_APP_API_ENDPOINT}/payment/create-payment/`,
+            `${process.env.REACT_APP_API_ENDPOINT}/publisher/create-publisher/`,
             {
               name: values.name
             }
           )
           .then((res) => console.log(res));
-        navigate('/admin/payment');
+        navigate('/admin/publisher');
       }
     }
   };
@@ -123,13 +123,14 @@ const PaymentForm = () => {
       <Card>
         <CardHeader
           subheader="The information can be add"
-          title="PAYMENT FORM"
+          title="CATEGORY FORM"
         />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
             <Grid item md={12} xs={12}>
               <Controls.Input
+                helperText="Name Publisher"
                 label="Name"
                 name="name"
                 error={errors.name}
@@ -160,4 +161,4 @@ const PaymentForm = () => {
   );
 };
 
-export default PaymentForm;
+export default PublisherForm;

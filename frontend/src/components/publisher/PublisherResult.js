@@ -19,13 +19,13 @@ import {
 } from '@material-ui/core';
 import axios from 'axios';
 
-const CategoryResult = ({ categories }) => {
+const PublisherResult = ({ publishers }) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
-  const deleteCategoryHandler = (id) => {
+  const deletePublisherHandler = (id) => {
     axios
-      .delete(`${process.env.REACT_APP_API_ENDPOINT}/category/delete-category/${id}`)
+      .delete(`${process.env.REACT_APP_API_ENDPOINT}/publisher/delete-publisher/${id}`)
       .then((res) => console.log(res));
   };
 
@@ -51,24 +51,24 @@ const CategoryResult = ({ categories }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {categories.slice(0, limit).map((category) => (
+              {publishers.slice(0, limit).map((publisher) => (
                 <TableRow
                   hover
-                  key={category._id}
+                  key={publisher._id}
                 >
                   <TableCell style={{ textAlign: 'center' }}>
-                    {category.name}
+                    {publisher.name}
                   </TableCell>
                   <TableCell style={{ textAlign: 'center' }}>
                     <IconButton
                       component={RouterLink}
-                      to={`/admin/category-form?id=${category._id}`}
+                      to={`/admin/publisher-form?id=${publisher._id}`}
                     >
                       <EditIcon />
                     </IconButton>
                     <IconButton
                       onClick={() => {
-                        deleteCategoryHandler(category._id);
+                        deletePublisherHandler(publisher._id);
                       }}
                     >
                       <DeleteIcon />
@@ -82,7 +82,7 @@ const CategoryResult = ({ categories }) => {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={categories.length}
+        count={publishers.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -93,8 +93,8 @@ const CategoryResult = ({ categories }) => {
   );
 };
 
-CategoryResult.propTypes = {
-  categories: PropTypes.array.isRequired
+PublisherResult.propTypes = {
+  publishers: PropTypes.array.isRequired
 };
 
-export default CategoryResult;
+export default PublisherResult;
