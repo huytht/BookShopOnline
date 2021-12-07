@@ -226,7 +226,7 @@ const BookForm = () => {
               summary_content: values.summary_cotent,
               author: values.author,
               price: parseInt(values.price, 10),
-              image: image.name,
+              image: image === null ? values.image : image.name,
               publisher_id: values.publisher_id,
               category_id: selectedCategories.map((item) => item.value)
             }
@@ -234,7 +234,6 @@ const BookForm = () => {
           .then((res) => console.log(res));
         navigate('/admin/book');
       } else {
-        const uploadBook = storage.ref(`book/${image.name}`).put(image);
         axios
           .post(`${process.env.REACT_APP_API_ENDPOINT}/book/create-book/`, {
             title: values.title,
@@ -246,7 +245,10 @@ const BookForm = () => {
             category_id: selectedCategories.map((item) => item.value)
           })
           .then((res) => console.log(res));
+      }
+      if (image !== null) {
         // Upload image book
+        const uploadBook = storage.ref(`book/${image.name}`).put(image);
         uploadBook.on(
           'state_changed',
           (snapshot) => {},
@@ -263,8 +265,8 @@ const BookForm = () => {
               });
           }
         );
-        navigate('/admin/book');
       }
+      navigate('/admin/book');
       // resetForm();
     }
   };
@@ -389,16 +391,30 @@ const BookForm = () => {
               </FormHelperText>
             </Grid>
             <Grid item md={6} xs={12}>
-              <Controls.Input
-                label="Image"
-                name="image"
-                type="file"
-                InputLabelProps={{
-                  shrink: true
-                }}
-                onChange={handleFileChange}
-                variant="outlined"
-              />
+              {params.has('id') ? (
+                <Controls.Input
+                  label="Image"
+                  name="image"
+                  type="file"
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  onChange={handleFileChange}
+                  variant="outlined"
+                />
+              ) : (
+                <Controls.Input
+                  label="Image"
+                  name="image"
+                  type="file"
+                  required
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  onChange={handleFileChange}
+                  variant="outlined"
+                />
+              )}
             </Grid>
           </Grid>
         </CardContent>
