@@ -37,10 +37,29 @@ async def list_books(request: Request):
                         break
 
             book['category'] = category_name
-            
+
             books.append(book)
 
     return books
+
+
+@router.get("/list-book-by-category/{id}", response_description="find list book by category")
+async def find_list_book_by_category(id: int, request: Request):
+    books = []
+    for book in await request.app.mongodb["book"].find({'category_id': id}).to_list(length=100):
+        books.append(book)
+
+    return books
+
+
+@router.get("/list-book-by-name/{keyword}", response_description="find list book by name")
+async def find_list_book_by_name(keyword: str, request: Request):
+    books = []
+    for book in await request.app.mongodb["book"].find({"title": {"$regex": keyword}}).to_list(length=100):
+        books.append(book)
+
+    return books
+
 
 @router.get("/list-best-book", response_description="List best book")
 async def list_best_books(request: Request):
@@ -48,9 +67,11 @@ async def list_best_books(request: Request):
 
     for book in await request.app.mongodb["book"].find().to_list(length=8):
         if isinstance(book["_id"], int):
-            books.append(book)
+            if await get_quantity_active_book(book['_id'], request) != 0:
+                books.append(book)
 
     return books
+
 
 @router.get("/list-newest-book", response_description="List newest book")
 async def list_newest_books(request: Request):
@@ -58,7 +79,8 @@ async def list_newest_books(request: Request):
 
     for book in await request.app.mongodb["book"].find(sort=[('$natural', -1)]).to_list(length=8):
         if isinstance(book["_id"], int):
-            books.append(book)
+            if await get_quantity_active_book(book['_id'], request) != 0:
+                books.append(book)
 
     return books
 
@@ -76,7 +98,7 @@ async def get_book(id: int, request: Request):
         book['quantity_active'] = await get_quantity_active_book(book['_id'], request)
         book['rate'] = await get_rate_book(book['_id'], request)
         book['review'] = await get_review_book(book['_id'], request)
-        
+
         return JSONResponse(status_code=status.HTTP_200_OK, content=book)
 
     raise HTTPException(status_code=404, detail="Book {id} not found")
@@ -85,24 +107,24 @@ async def get_book(id: int, request: Request):
 @router.get("/get-quantity-active-book/{id}", response_description="Get quantity active book")
 async def get_quantity_active_book(id: int, request: Request):
     count: int = 0
-    if (book := await request.app.mongodb["book"].find_one({"_id": id})) is not None:
-        for book_details in await request.app.mongodb["book_details"].find({ "book_id": id, "isSold": False }).to_list(1000):
-            count += 1
-        return count
+    for book_details in await request.app.mongodb["book_details"].find({"book_id": id, "isSold": False}).to_list(50):
+        count += 1
+    
+    return count
 
-    raise HTTPException(status_code=404, detail=f"Book {id} not found")
 
 @router.get("/get-list-book/{id}/{quantity}", response_description="Get list book from quantity")
 async def get_list_book_for_order(id: int, quantity: int, request: Request):
     books = []
     count: int = 0
     if (book := await request.app.mongodb["book"].find_one({"_id": id})) is not None:
-        for book_details in await request.app.mongodb["book_details"].find({ "book_id": id, "isSold": False }).to_list(quantity):
+        for book_details in await request.app.mongodb["book_details"].find({"book_id": id, "isSold": False}).to_list(quantity):
             books.append(book_details)
-        
+
         return books
 
     raise HTTPException(status_code=404, detail=f"Book {id} not found")
+
 
 @router.post("/create-book/")
 async def create_book(request: Request, book: BookModel = Body(...)):
@@ -114,6 +136,7 @@ async def create_book(request: Request, book: BookModel = Body(...)):
     )
 
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_book)
+
 
 @router.put("/update-book/{id}")
 async def update_book(id: int, request: Request, book: BookUpdateModel = Body(...)):
@@ -138,6 +161,7 @@ async def update_book(id: int, request: Request, book: BookUpdateModel = Body(..
 
     raise HTTPException(status_code=404, detail=f"book {id} not found")
 
+
 @router.delete("/delete-book/{id}")
 async def delete_book(id: int, request: Request):
     delete_book = await request.app.mongodb["book"].delete_one({"_id": id})
@@ -146,6 +170,7 @@ async def delete_book(id: int, request: Request):
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail=f"book {id} not found")
+
 
 @router.get("/get-rate-book/{id}")
 async def get_rate_book(id: int, request: Request):
@@ -158,15 +183,18 @@ async def get_rate_book(id: int, request: Request):
         return 0
     return int(sum_rate/total_rate)
 
+
 @router.get("/get-review-book/{id}")
 async def get_review_book(id: int, request: Request):
     reviews = []
     for review in await request.app.mongodb["review"].find({"book_id": id}).to_list(1000):
         if (user := await request.app.mongodb["user"].find_one({"_id": review['user_id']})) is not None:
-            review['user'] = user 
+            review['user'] = user
         reviews.append(review)
 
     return reviews
+
+
 @router.get('/check-book/{title}')
 async def check_books(title: str, request: Request):
     for book in await list_books(request):

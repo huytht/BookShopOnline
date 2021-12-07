@@ -26,7 +26,7 @@ async def get_province_city(code: str, request: Request):
 @router.get("/get-town-district-by-province-city/{code}", response_description="Get list town district")
 async def get_town_district_list(code: str, request: Request):
     towns_districts = []
-    for town_district in await request.app.mongodb["town_district"].find_one({'parent_code' == code}).to_list(length=100):
+    for town_district in await request.app.mongodb["town_district"].find({'parent_code': code}).to_list(length=100):
         town_district['_id'] = str(town_district['_id'])
         towns_districts.append(town_district)
     return towns_districts
