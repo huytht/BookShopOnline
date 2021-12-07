@@ -67,8 +67,9 @@ async def list_best_books(request: Request):
 
     for book in await request.app.mongodb["book"].find().to_list(length=8):
         if isinstance(book["_id"], int):
-            if await get_quantity_active_book(book['_id'], request) != 0:
-                books.append(book)
+            book['rate'] = await get_rate_book(book['_id'], request)
+            book['review'] = await get_review_book(book['_id'], request)
+            books.append(book)
 
     return books
 
@@ -79,8 +80,9 @@ async def list_newest_books(request: Request):
 
     for book in await request.app.mongodb["book"].find(sort=[('$natural', -1)]).to_list(length=8):
         if isinstance(book["_id"], int):
-            if await get_quantity_active_book(book['_id'], request) != 0:
-                books.append(book)
+            book['rate'] = await get_rate_book(book['_id'], request)
+            book['review'] = await get_review_book(book['_id'], request)
+            books.append(book)
 
     return books
 
