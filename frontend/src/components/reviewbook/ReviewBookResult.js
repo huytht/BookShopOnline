@@ -46,7 +46,7 @@ const ReviewBookResult = ({ reviews }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {reviews.slice(0, limit).map((review) => (
+              {reviews.slice(page * limit, page * limit + limit).map((review) => (
                 <TableRow hover key={review._id}>
                   <TableCell>{review.user_username}</TableCell>
                   <TableCell>{review.book_title}</TableCell>

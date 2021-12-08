@@ -90,7 +90,7 @@ const TotalRevenueResult = ({ users }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.slice(0, limit).map((user) => (
+              {users.slice(page * limit, page * limit + limit).map((user) => (
                 <TableRow
                   hover
                   key={user._id}

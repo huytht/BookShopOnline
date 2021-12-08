@@ -55,7 +55,7 @@ const BookListResult = ({ books }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {books.slice(0, limit).map((book) => (
+              {books.slice(page * limit, page * limit + limit).map((book) => (
                 <TableRow hover key={book._id}>
                   <TableCell>
                     <LazyLoadImage

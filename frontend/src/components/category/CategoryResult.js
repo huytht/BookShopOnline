@@ -22,7 +22,7 @@ import axios from 'axios';
 const CategoryResult = ({ categories }) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-
+  
   const deleteCategoryHandler = (id) => {
     axios
       .delete(`${process.env.REACT_APP_API_ENDPOINT}/category/delete-category/${id}`)
@@ -51,7 +51,7 @@ const CategoryResult = ({ categories }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {categories.slice(0, limit).map((category) => (
+              {categories.slice(page * limit, page * limit + limit).map((category) => (
                 <TableRow
                   hover
                   key={category._id}

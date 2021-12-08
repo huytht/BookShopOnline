@@ -51,7 +51,7 @@ const PaymentResult = ({ payments }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {payments.slice(0, limit).map((payment) => (
+              {payments.slice(page * limit, page * limit + limit).map((payment) => (
                 <TableRow hover key={payment._id}>
                   <TableCell style={{ textAlign: 'center' }}>
                     {payment.name}

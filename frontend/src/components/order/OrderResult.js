@@ -56,7 +56,7 @@ const OrderResult = ({ orders }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders.slice(0, limit).map((order) => (
+              {orders.slice(page * limit, page * limit + limit).map((order) => (
                 <TableRow hover key={order._id}>
                   <TableCell>{order._id}</TableCell>
                   <TableCell>{order.user_id.fullname}</TableCell>

@@ -51,7 +51,7 @@ const PublisherResult = ({ publishers }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {publishers.slice(0, limit).map((publisher) => (
+              {publishers.slice(page * limit, page * limit + limit).map((publisher) => (
                 <TableRow
                   hover
                   key={publisher._id}
