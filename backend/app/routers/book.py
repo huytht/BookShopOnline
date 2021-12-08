@@ -52,6 +52,12 @@ async def find_list_book_by_category(id: int, request: Request):
                 book['rate'] = await get_rate_book(book['_id'], request)
                 book['review'] = len(await get_review_book(book['_id'], request))
                 books.append(book)
+    if id == 16:
+        for book in await request.app.mongodb["book"].find(sort=[('$natural', -1)]).to_list(length=500):
+            if isinstance(book["_id"], int):
+                book['rate'] = await get_rate_book(book['_id'], request)
+                book['review'] = len(await get_review_book(book['_id'], request))
+                books.append(book)
     else:
         for book in await request.app.mongodb["book"].find({'category_id': id}).to_list(length=100):
             book['rate'] = await get_rate_book(book['_id'], request)
