@@ -11,10 +11,11 @@ async def list_town_district(request: Request):
 
     return towns_districts
 
-# @router.get("/get-town-district/{id}", response_description="Get town district detail")
-# async def get_town_district(id: int, request: Request):
-#     if (town_district := await request.app.mongodb["town_district"].find_one({"_id": id})) is not None:
-#         return town_district
+@router.get("/get-town-district/{code}", response_description="Get town district detail")
+async def get_town_district(code: str, request: Request):
+    if (town_district := await request.app.mongodb["town_district"].find_one({"code": code})) is not None:
+        town_district['_id'] = str(town_district['_id'])
+        return town_district
     
-#     raise HTTPException(status_code=404, detail="town_district {id} not found")
+    raise HTTPException(status_code=404, detail=f"town_district {code} not found")
 

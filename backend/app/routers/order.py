@@ -4,8 +4,11 @@ from fastapi.encoders import jsonable_encoder
 from ..models.order import OrderModel, OrderUpdateModel
 from .order_details import delete_order_detail
 import time
+from datetime import datetime
 
 router = APIRouter()
+
+TIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
 async def getNextSequence(name: str, request: Request):
     ret = await request.app.mongodb["order"].find_one_and_update(
@@ -40,7 +43,7 @@ async def get_order(id: int, request: Request):
 @router.post("/create-order/")
 async def create_order(request: Request, order: OrderModel = Body(...)):
     order = jsonable_encoder(order)
-    order['created_date'] = int(time.time())
+    order['created_date'] = datetime.strptime(order['created_date'], TIME_FORMAT + "+00:00").timestamp()
     order['_id'] = int(await getNextSequence("orderid", request))
     new_order = await request.app.mongodb["order"].insert_one(order)
     created_order = await request.app.mongodb["order"].find_one(

@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from ..models.book import BookModel, BookUpdateModel
 from ..routers.category import list_category
+from ..routers.book_details import update_book_details
 import re
 
 router = APIRouter()
@@ -66,11 +67,10 @@ async def find_list_book_by_category(id: int, request: Request):
 
     return books
 
-
 @router.get("/list-book-by-name/{keyword}", response_description="find list book by name")
 async def find_list_book_by_name(keyword: str, request: Request):
     books = []
-    for book in await request.app.mongodb["book"].find({"title": {"$in": [re.compile(f'{keyword.lower()}'), re.compile(f'{keyword.capitalize()}')]}}).to_list(length=100):
+    for book in await request.app.mongodb["book"].find({"title": {"$in": [re.compile(f'{keyword.lower()}'), re.compile(f'{keyword.capitalize()}'), keyword]}}).to_list(length=100):
         book['rate'] = await get_rate_book(book['_id'], request)
         book['review'] = len(await get_review_book(book['_id'], request))
         books.append(book)
@@ -110,7 +110,6 @@ async def list_best_books(request: Request):
 
     return books
 
-
 @router.get("/list-newest-book", response_description="List newest book")
 async def list_newest_books(request: Request):
     books = []
@@ -122,7 +121,6 @@ async def list_newest_books(request: Request):
             books.append(book)
 
     return books
-
 
 @router.get("/get-book/{id}", response_description="Get book detail")
 async def get_book(id: int, request: Request):
@@ -162,13 +160,15 @@ async def get_quantity_active_book(id: int, request: Request):
     return count
 
 
-@router.get("/get-list-book/{id}/{quantity}", response_description="Get list book from quantity")
+@router.get("/get-list-book-detail/{id}/{quantity}", response_description="Get list book from quantity")
 async def get_list_book_for_order(id: int, quantity: int, request: Request):
     books = []
     count: int = 0
     if (book := await request.app.mongodb["book"].find_one({"_id": id})) is not None:
-        for book_details in await request.app.mongodb["book_details"].find({"book_id": id, "isSold": False}).to_list(quantity):
-            books.append(book_details)
+        for book_detail in await request.app.mongodb["book_details"].find({"book_id": id, "isSold": False}).to_list(quantity):
+            book_detail['isSold'] = True
+            await update_book_details(book_detail['_id'], request, book_detail)
+            books.append(book_detail['_id'])
 
         return books
 

@@ -56,10 +56,12 @@ async def create_book_details(request: Request, book_details: BookDetailsModel =
 
 @router.put("/update-book-detail/{id}")
 async def update_book_details(id: int, request: Request, book_details: BookDetailsUpdateModel = Body(...)):
-    book_details = {k: v for k, v in book_details.dict().items() if v is not None}
+    if isinstance(book_details, dict) == False:
+        book_details = {k: v for k, v in book_details.dict().items() if v is not None}
 
     if (len(book_details) >= 1):
-        book_details['published_date'] = book_details['published_date'].timestamp()
+        if isinstance(book_details['published_date'], datetime) == True:
+            book_details['published_date'] = book_details['published_date'].timestamp()
         update_book_details_result = await request.app.mongodb["book_details"].update_one(
             {"_id": id},
             {"$set": book_details}

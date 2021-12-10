@@ -6,7 +6,6 @@ class OrderDetailsModel(BaseModel):
     order_id: int = Field(...)
     book_detail_id: int = Field(...)
     price: int = Field(...)
-    quantity: int = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -15,8 +14,7 @@ class OrderDetailsModel(BaseModel):
             "example": {
                 "order_id": 1,
                 "book_detail_id": 1,
-                "price": 20000,
-                "quantity": 1
+                "price": 20000
             }
         } 
 
@@ -24,7 +22,6 @@ class OrderDetailsUpdateModel(BaseModel):
     order_id: Optional[int]
     book_detail_id: Optional[int]
     price: Optional[int]
-    quantity: Optional[int]
 
     class Config:
         allow_population_by_field_name = True
@@ -32,7 +29,6 @@ class OrderDetailsUpdateModel(BaseModel):
             "example": {
                 "order_id": 1,
                 "book_detail_id": 1,
-                "price": 20000,
-                "quantity": 1
+                "price": 20000
             }
         } 

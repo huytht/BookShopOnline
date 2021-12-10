@@ -11,9 +11,9 @@ class OrderModel(BaseModel):
     payment_id: int = Field(...)
     billing_address_id: int = Field(...)
     shipping_address_id: int = Field(...)
-    order_tracking_number: str = Field(default_factory=uuid.uuid4)
+    order_tracking_number: Optional[str] = Field(alias="order_tracking_number", default_factory=uuid.uuid4)
     total_quantity: int = Field(...)
-    status: str = Field(...)
+    status: Optional[str] = Field(...)
 
     class Config:
         allow_population_by_field_name = True
