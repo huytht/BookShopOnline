@@ -17,10 +17,7 @@ const OrderToolbar = (props) => (
         display: 'flex',
         justifyContent: 'flex-end'
       }}
-    >
-      <Button>Import</Button>
-      <Button sx={{ mx: 1 }}>Export</Button>
-    </Box>
+    />
     <Box sx={{ mt: 3 }}>
       <Card>
         <CardContent>

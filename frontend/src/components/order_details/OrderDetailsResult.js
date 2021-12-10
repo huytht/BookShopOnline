@@ -42,7 +42,6 @@ const OrderDetailsResult = ({ orderDetails }) => {
                 <TableCell>ISBN</TableCell>
                 <TableCell>Title</TableCell>
                 <TableCell>Price</TableCell>
-                <TableCell>Quantity</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -52,7 +51,6 @@ const OrderDetailsResult = ({ orderDetails }) => {
                   <TableCell>{orderDetail.book_detail.isbn}</TableCell>
                   <TableCell>{orderDetail.book.title}</TableCell>
                   <TableCell>{orderDetail.book.price}</TableCell>
-                  <TableCell>{orderDetail.quantity}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

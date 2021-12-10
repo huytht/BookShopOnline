@@ -49,7 +49,8 @@ const OrderResult = ({ orders }) => {
                 <TableCell>Total Quantity</TableCell>
                 <TableCell>Total Money</TableCell>
                 <TableCell>Billing Address Id</TableCell>
-                <TableCell>Shipping Address Id</TableCell>                
+                <TableCell>Shipping Address Id</TableCell>  
+                <TableCell>Order Tracking Number</TableCell>              
                 <TableCell>Payment</TableCell>
                 <TableCell>Created Date</TableCell>
                 <TableCell>Status</TableCell>
@@ -64,6 +65,7 @@ const OrderResult = ({ orders }) => {
                   <TableCell>{order.total_money}</TableCell>
                   <TableCell>{order.billing_address_id}</TableCell>
                   <TableCell>{order.shipping_address_id}</TableCell>
+                  <TableCell>{order.order_tracking_number}</TableCell>
                   <TableCell>{order.payment_id.name}</TableCell>
                   <TableCell>
                     {moment.unix(order.created_date).format('DD/MM/yyyy')}

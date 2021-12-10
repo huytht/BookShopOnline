@@ -32,11 +32,6 @@ import NavItem from './NavItem';
 
 const items = [
   {
-    href: '/dashboard',
-    icon: BarChartIcon,
-    title: 'Dashboard'
-  },
-  {
     href: '/admin/users',
     icon: UsersIcon,
     title: 'Users'
@@ -80,47 +75,12 @@ const items = [
     href: '/admin/publisher',
     icon: UsersIcon,
     title: 'Publisher'
-  },
-  {
-    href: '/admin/totalrevenue',
-    icon: Layers,
-    title: 'Total Revenu'
-  },
-  {
-    href: '/profile',
-    icon: UserIcon,
-    title: 'Profile'
-  },
-  {
-    href: '/admin/account',
-    icon: UserIcon,
-    title: 'Account'
-  },
-  {
-    href: '/settings',
-    icon: SettingsIcon,
-    title: 'Settings'
-  },
-  {
-    href: '/login',
-    icon: LockIcon,
-    title: 'Login'
-  },
-  {
-    href: '/register',
-    icon: UserPlusIcon,
-    title: 'Register'
-  },
-  {
-    href: '/404',
-    icon: AlertCircleIcon,
-    title: 'Error'
   }
 ];
 
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {
   const location = useLocation();
-  const user = useSelector((state) => state.auth.user);
+  // const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     if (openMobile && onMobileClose) {

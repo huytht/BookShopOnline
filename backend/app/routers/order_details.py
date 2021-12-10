@@ -22,11 +22,12 @@ async def getNextSequence(name: str, request: Request):
 @router.get("/", response_description="List all order_details")
 async def list_order_details(request: Request):
     order_details = []
-    for order_detail in await request.app.mongodb["order_details"].find().to_list(length=100):
+    for order_detail in await request.app.mongodb["order_details"].find().to_list(length=1000):
         if isinstance(order_detail["_id"], int):
             book_detail = await get_book_details(order_detail['book_detail_id'], request)
             order_detail['book_detail'] = book_detail
-            order_detail['book'] = await get_book(book_detail['book_id'], request)
+            if (book := await request.app.mongodb["book"].find_one({"_id": book_detail['book_id']})) is not None:
+                order_detail['book'] = book
 
             order_details.append(order_detail)
 

@@ -5,20 +5,20 @@ import { ThemeProvider, StyledEngineProvider } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import GlobalStyles from './components/GlobalStyles';
 import theme from './theme';
-import { routesAdmin, routesUser, routes } from './routes';
+import { routesAdmin } from './routes';
 import EventBus from './common/EventBus';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import './App.css';
-import { history } from './helpers/history';
-import { clearMessage } from './actions/message';
-import { logout } from './actions/auth';
+// import { history } from './helpers/history';
+// import { clearMessage } from './actions/message';
+// import { logout } from './actions/auth';
 
 const App = () => {
   // const { user, isLoggedIn } = useSelector((state) => state.auth);
   // const [showAdminBoard, setShowAdminBoard] = useState(false);
   // const [currentUser, setCurrentUser] = useState(undefined);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   // history.listen((location) => {
   //   dispatch(clearMessage()); // clear message when changing location

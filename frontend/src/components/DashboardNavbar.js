@@ -15,42 +15,41 @@ import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import InputIcon from '@material-ui/icons/Input';
 import { useDispatch, useSelector } from 'react-redux';
 import Logo from './Logo';
-import { clearMessage } from '../actions/message';
-import { history } from '../helpers/history';
-import EventBus from '../common/EventBus';
-import { logout } from '../actions/auth';
-import Login from '../pages/Login';
+// import { clearMessage } from '../actions/message';
+// import { history } from '../helpers/history';
+// import EventBus from '../common/EventBus';
+// import Login from '../pages/Login';
 
 const DashboardNavbar = ({ onMobileNavOpen, ...rest }) => {
   const [notifications] = useState([]);
-  const user = useSelector((state) => state.auth.user);
-  const [showAdminBoard, setShowAdminBoard] = useState(false);
-  const [currentUser, setCurrentUser] = useState(undefined);
-  const dispatch = useDispatch();
+  // const user = useSelector((state) => state.auth.user);
+  // const [showAdminBoard, setShowAdminBoard] = useState(false);
+  // const [currentUser, setCurrentUser] = useState(undefined);
+  // const dispatch = useDispatch();
 
-  history.listen((location) => {
-    dispatch(clearMessage()); // clear message when changing location
-  });
+  // history.listen((location) => {
+  //   dispatch(clearMessage()); // clear message when changing location
+  // });
 
-  useEffect(() => {
-    if (user) {
-      setCurrentUser(user);
-      setShowAdminBoard(user.roles.includes('ROLE_ADMIN'));
-    }
+  // useEffect(() => {
+  //   if (user) {
+  //     setCurrentUser(user);
+  //     setShowAdminBoard(user.roles.includes('ROLE_ADMIN'));
+  //   }
 
-    EventBus.on('logout', () => {
-      this.logOut();
-    });
-    return () => {
-      EventBus.remove('logout');
-    };
-  });
+  //   EventBus.on('logout', () => {
+  //     this.logOut();
+  //   });
+  //   return () => {
+  //     EventBus.remove('logout');
+  //   };
+  // });
 
-  const logOut = () => {
-    dispatch(logout());
-    setShowAdminBoard(false);
-    setCurrentUser(undefined);
-  };
+  // const logOut = () => {
+  //   dispatch(logout());
+  //   setShowAdminBoard(false);
+  //   setCurrentUser(undefined);
+  // };
 
   return (
     <AppBar
@@ -72,9 +71,9 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }) => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          <IconButton LinkComponent={<Login />} onClick={logOut} color="inherit">
+          {/* <IconButton LinkComponent={<Login />} onClick={logOut} color="inherit">
             <InputIcon />
-          </IconButton>
+          </IconButton> */}
         </Hidden>
         <Hidden lgUp>
           <IconButton
