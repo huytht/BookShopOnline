@@ -60,3 +60,25 @@ class UserUpdateModel(BaseModel):
 class LoginModel(BaseModel):
     username: str
     password: str
+
+class RegisterModel(BaseModel):
+    firstName: str
+    lastName: str
+    username: str
+    email: str
+    password: str
+    password_confirm: str
+    
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "firstName": "your firstName",
+                "lastName": "your lastName",
+                "username": "username",
+                "password": "password",
+                "password_confirm": "password_confirm",
+                "email": "email",
+            }
+
+        }

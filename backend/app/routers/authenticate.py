@@ -56,6 +56,6 @@ async def validate_user(model: LoginModel, request: Request):
             )
             return {"success": True, "id": user['_id'], "username": user['username'], "email": user['email'], "roles": await get_all_role(user['_id'], request), "accessToken": access_token}
         else:
-            return {"success": False, "message": "Incorrect password"}
+            return {"success": False, "message": "Sai mật khẩu"}
     else:
-        return {"success": False, "message": "Invalid username/password"}
+        return {"success": False, "message": "Tài khoản/mật khẩu khồng chính xác"}

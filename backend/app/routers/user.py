@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from datetime import datetime
 from passlib.context import CryptContext
-from ..models.user import UserModel, UserUpdateModel
+from ..models.user import RegisterModel, UserModel, UserUpdateModel
 import time
 
 router = APIRouter()
@@ -65,6 +65,36 @@ async def create_user(request: Request, user: UserModel = Body(...)):
     )
 
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_user)
+
+@router.post("/register/")
+async def register(request: Request, userRegister: RegisterModel = Body(...)):
+    userRegister = jsonable_encoder(userRegister)
+    
+    if (user := await request.app.mongodb["user"].find_one({"username": userRegister['username']})) is None:
+        if (user := await request.app.mongodb["user"].find_one({"email": userRegister['email']})) is None:
+            if (userRegister['password'] == userRegister['password_confirm']):
+                new_user = await request.app.mongodb["user"].insert_one({
+                    "_id": int(await getNextSequence("userid", request)),
+                    "fullname": userRegister['lastName'] + " " + userRegister['firstName'],
+                    "username": userRegister['username'],
+                    "password": get_password_hash(userRegister['password']),
+                    "email": userRegister['email'],
+                    "registration_date": int(time.time()),
+                    "avatar": "default-avatar.jpg",
+                    "phone": "0988888888",
+                    "date_of_birth": int(time.time()),
+                    "gender": 1
+                })
+                created_user = await request.app.mongodb["user"].find_one(
+                    {"_id": new_user.inserted_id}
+                )
+                return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_user)
+            else: 
+                return {"success": False, "message": "Mật khẩu và mật khẩu xác nhận không trùng khớp"}
+        else: 
+            return {"success": False, "message": "Email đã tồn tại"}
+    else: 
+        return {"success": False, "message": "Tài khoản đã tồn tại"}
 
 @router.put("/update-user/{id}")
 async def update_user(id: int, request: Request, user: UserUpdateModel = Body(...)):
