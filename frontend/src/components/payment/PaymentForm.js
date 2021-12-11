@@ -97,7 +97,7 @@ const PaymentForm = () => {
           .put(
             `${
               process.env.REACT_APP_API_ENDPOINT
-            }/payment/update-payment/${params.get('id')}`,
+            }/payment/update-payment/?id=${params.get('id')}`,
             {
               name: values.name
             }

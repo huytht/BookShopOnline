@@ -97,7 +97,7 @@ const PublisherForm = () => {
           .put(
             `${
               process.env.REACT_APP_API_ENDPOINT
-            }/publisher/update-publisher/${params.get('id')}`,
+            }/publisher/update-publisher/?id=${params.get('id')}`,
             {
               name: values.name
             }

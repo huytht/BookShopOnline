@@ -97,7 +97,7 @@ const CategoryForm = () => {
           .put(
             `${
               process.env.REACT_APP_API_ENDPOINT
-            }/category/update-category/${params.get('id')}`,
+            }/category/update-category/?id=${params.get('id')}`,
             {
               name: values.name
             }

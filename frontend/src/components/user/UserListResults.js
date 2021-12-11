@@ -87,12 +87,12 @@ const UserListResults = ({ users }) => {
                     {moment.unix(user.registration_date).format('DD/MM/yyyy')}
                   </TableCell>
                   <TableCell>
-                    <IconButton
+                    {/* <IconButton
                       component={RouterLink}
                       to={`/admin/user-form?id=${user._id}`}
                     >
                       <EditIcon />
-                    </IconButton>
+                    </IconButton> */}
                     <IconButton
                       onClick={() => {
                         deleteUserHandler(user._id);
