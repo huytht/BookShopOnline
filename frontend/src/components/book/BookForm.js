@@ -220,7 +220,7 @@ const BookForm = () => {
           .put(
             `${
               process.env.REACT_APP_API_ENDPOINT
-            }/book/update-book/?id=${params.get('id')}`,
+            }/book/update-book/${params.get('id')}`,
             {
               title: values.title,
               summary_content: values.summary_cotent,

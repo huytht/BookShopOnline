@@ -186,7 +186,7 @@ async def create_book(request: Request, book: BookModel = Body(...)):
 
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_book)
 
-@router.put("/update-book/")
+@router.put("/update-book/{id}")
 async def update_book(id: int, request: Request, book: BookUpdateModel = Body(...)):
     book = {k: v for k, v in book.dict().items() if v is not None}
 

@@ -126,7 +126,7 @@ const BookDetailForm = () => {
           .put(
             `${
               process.env.REACT_APP_API_ENDPOINT
-            }/book-detail/update-book-detail/?id=${params.get('id')}`,
+            }/book-detail/update-book-detail/${params.get('id')}`,
             {
               isbn: values.isbn,
               published_date: pd,
