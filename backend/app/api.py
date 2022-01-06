@@ -11,8 +11,6 @@ from .routers.order import router as router_order
 from .routers.order_details import router as router_order_detail 
 from .routers.review import router as router_review 
 from .routers.authenticate import router as router_authenticate, get_current_user 
-from .routers.cart import router as router_cart 
-from .routers.cart_items import router as router_cart_items
 from .routers.publisher import router as router_publisher
 from .routers.province_city import router as router_province_city
 from .routers.town_district import router as router_town_district
@@ -50,8 +48,6 @@ app.include_router(router_order, tags=["Orders"], prefix="/order")
 app.include_router(router_order_detail, tags=["Order Details"], prefix="/order-detail")
 app.include_router(router_review, tags=["Reviews"], prefix="/review")
 app.include_router(router_authenticate, tags=["Authenticate"], prefix="/authenticate")
-app.include_router(router_cart, tags=["Carts"], prefix="/cart")
-app.include_router(router_cart_items, tags=["Cart Items"], prefix="/cart-items")
 app.include_router(router_publisher, tags=["Publisher"], prefix="/publisher")
 app.include_router(router_province_city, tags=["Province City"], prefix="/province-city")
 app.include_router(router_town_district, tags=["Town District"], prefix="/town-district")
