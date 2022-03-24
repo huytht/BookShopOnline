@@ -101,8 +101,8 @@ async def update_user(id: int, request: Request, user: UserUpdateModel = Body(..
     user = {k: v for k, v in user.dict().items() if v is not None}
 
     if (len(user) >= 1):
-        if user['password'] is not None:
-            user['password'] = get_password_hash(user['password'])
+        # if user['password'] is not None:
+        #     user['password'] = get_password_hash(user['password'])
         # print(user['date_of_birth'])
         # if user['date_of_birth'] is not None:
         #    user['date_of_birth'] = user['date_of_birth'].timestamp()        
